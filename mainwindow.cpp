@@ -18,23 +18,23 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
-#include <QStandardPaths>
-#include <QDir>
 #include <QDebug>
+#include <QDir>
 #include <QFile>
 #include <QFileDialog>
 #include <QMessageBox>
+#include <QRegExp>
+#include <QStandardPaths>
+#include <algorithm>
+#include <array>
+#include <list>
 #include <locale.h>
+#include <map>
 #include <string>
 #include <vector>
-#include <list>
-#include <algorithm>
-#include <map>
-#include <QRegExp>
-#include <array>
 
-#include "minizip/zip.h"
 #include "minizip/unzip.h"
+#include "minizip/zip.h"
 
 using std::vector;
 using std::list;
@@ -82,13 +82,12 @@ list<QString> getSubdirsAndFiles(QString basedir)
 {
     list<QString> rv;
 
-    for (auto const& fn: {
-         "gpg-agent.conf", "gpg.conf", "pubring.gpg", "secring.gpg",
-         "trustdb.gpg", "pubring.kbx", "sshcontrol", "dirmngr.conf",
-         "gpa.conf", "scdaemon.conf", "gpgsm.conf", "policies.txt",
-         "trustlist.txt", "scd-event", "tofu.db", "gpg.conf-2.1",
-         "gpg.conf-2.0", "gpg.conf-2", "gpg.conf-1.4", "gpg.conf-1"
-     }) {
+    for (auto const& fn : {
+             "gpg-agent.conf", "gpg.conf", "pubring.gpg", "secring.gpg",
+             "trustdb.gpg", "pubring.kbx", "sshcontrol", "dirmngr.conf",
+             "gpa.conf", "scdaemon.conf", "gpgsm.conf", "policies.txt",
+             "trustlist.txt", "scd-event", "tofu.db", "gpg.conf-2.1",
+             "gpg.conf-2.0", "gpg.conf-2", "gpg.conf-1.4", "gpg.conf-1" }) {
         QFileInfo qfi(basedir + QDir::separator() + fn);
         if (qfi.exists() && qfi.isFile() && qfi.isReadable())
             rv.push_back(qfi.fileName());
@@ -99,7 +98,7 @@ list<QString> getSubdirsAndFiles(QString basedir)
     if (qd.exists() && qd.isReadable()) {
         qd.setFilter(QDir::Files);
         auto files = qd.entryInfoList();
-        for (const auto& qfi: files)
+        for (const auto& qfi : files)
             if (qfi.isReadable())
                 rv.push_back(dirname + QDir::separator() + qfi.fileName());
     }
@@ -110,7 +109,7 @@ list<QString> getSubdirsAndFiles(QString basedir)
     if (qd.exists() && qd.isReadable()) {
         qd.setFilter(QDir::Files);
         auto files = qd.entryInfoList();
-        for (const auto& qfi: files)
+        for (const auto& qfi : files)
             if (qfi.isReadable() && revocs.exactMatch(qfi.fileName()))
                 rv.push_back(dirname + QDir::separator() + qfi.fileName());
     }
@@ -121,7 +120,7 @@ list<QString> getSubdirsAndFiles(QString basedir)
     if (qd.exists() && qd.isReadable()) {
         qd.setFilter(QDir::Files);
         auto files = qd.entryInfoList();
-        for (const auto& qfi: files)
+        for (const auto& qfi : files)
             if (qfi.isReadable() && privkeys.exactMatch(qfi.fileName()))
                 rv.push_back(dirname + QDir::separator() + qfi.fileName());
     }
@@ -129,13 +128,13 @@ list<QString> getSubdirsAndFiles(QString basedir)
     return rv;
 }
 
-map<QString, vector<uint8_t>> getFilesAndContents(QString basedir)
+map<QString, vector<uint8_t> > getFilesAndContents(QString basedir)
 {
-    map<QString, vector<uint8_t>> rv;
+    map<QString, vector<uint8_t> > rv;
 
-    for (auto const& fn: getSubdirsAndFiles(basedir)) {
+    for (auto const& fn : getSubdirsAndFiles(basedir)) {
         QFile fh(basedir + QDir::separator() + fn);
-        if (! fh.open(QIODevice::ReadOnly))
+        if (!fh.open(QIODevice::ReadOnly))
             continue;
         auto qba = fh.readAll();
         rv[fn] = vector<uint8_t>(qba.cbegin(), qba.cend());
@@ -160,7 +159,7 @@ map<QString, QByteArray> readSherpaFile(QString zipfilename)
 
     unzGetGlobalComment(zipfile, &comment_buf[0], comment_buf.size());
     QString version(&comment_buf[0]);
-    if (! version.startsWith("Sherpa")) {
+    if (!version.startsWith("Sherpa")) {
         unzClose(zipfile);
         throw NotASherpa();
     }
@@ -176,13 +175,13 @@ map<QString, QByteArray> readSherpaFile(QString zipfilename)
         std::fill(filename.begin(), filename.end(), '\0');
 
         unzGetCurrentFileInfo(zipfile,
-                              &info,
-                              &filename[0],
-                filename.size(),
-                NULL,
-                0,
-                &comment_buf[0],
-                comment_buf.size());
+            &info,
+            &filename[0],
+            filename.size(),
+            NULL,
+            0,
+            &comment_buf[0],
+            comment_buf.size());
 
         if (info.uncompressed_size > (256 * 1048576)) {
             unzClose(zipfile);
@@ -195,8 +194,8 @@ map<QString, QByteArray> readSherpaFile(QString zipfilename)
             throw UncompressError();
         }
         if (0 > unzReadCurrentFile(zipfile,
-                                   uncompressed.data(),
-                                   static_cast<uint32_t>(uncompressed.size()))) {
+                    uncompressed.data(),
+                    static_cast<uint32_t>(uncompressed.size()))) {
             unzCloseCurrentFile(zipfile);
             unzClose(zipfile);
             throw UncompressError();
@@ -214,15 +213,14 @@ map<QString, QByteArray> readSherpaFile(QString zipfilename)
 }
 }
 
-MainWindow::MainWindow(QWidget *parent) :
-    QMainWindow { parent },
-    ui { new Ui::MainWindow },
-    gnupgDir { gpgme_get_dirinfo("homedir") }
+MainWindow::MainWindow(QWidget* parent)
+    : QMainWindow{ parent }
+    , ui{ new Ui::MainWindow }
+    , gnupgDir{ gpgme_get_dirinfo("homedir") }
 {
     gpgme_engine_info_t info;
 
-    if (gpg_err_code(gpgme_get_engine_info(&info)) == GPG_ERR_NO_ERROR)
-    {
+    if (gpg_err_code(gpgme_get_engine_info(&info)) == GPG_ERR_NO_ERROR) {
         while (info && info->protocol != GPGME_PROTOCOL_OpenPGP)
             info = info->next;
         if (!(info && info->version))
@@ -231,9 +229,7 @@ MainWindow::MainWindow(QWidget *parent) :
         uint32_t version = static_cast<uint8_t>(elements.at(0).toUInt());
         version = (version << 8) + static_cast<uint8_t>(elements.at(1).toUInt());
         version = (version << 8) + static_cast<uint8_t>(elements.at(2).toUInt());
-        gpgType = version < 0x00020000 ? GpgType::classic :
-                                         version < 0x00020100 ? GpgType::stable :
-                                                                GpgType::modern;
+        gpgType = version < 0x00020000 ? GpgType::classic : version < 0x00020100 ? GpgType::stable : GpgType::modern;
     }
 
     ui->setupUi(this);
@@ -243,9 +239,9 @@ MainWindow::MainWindow(QWidget *parent) :
 
     connect(ui->fileBtn, &QPushButton::clicked, this, &MainWindow::changeFileClicked);
     connect(ui->comboBox,
-            static_cast<void(QComboBox::*)(int)>(&QComboBox::activated),
-            this,
-            &MainWindow::comboChanged);
+        static_cast<void (QComboBox::*)(int)>(&QComboBox::activated),
+        this,
+        &MainWindow::comboChanged);
     connect(ui->actionQuit, &QAction::triggered, qApp, &QApplication::quit);
     connect(ui->quitBtn, &QPushButton::clicked, qApp, &QApplication::quit);
     connect(ui->goBtn, &QPushButton::clicked, this, &MainWindow::go);
@@ -268,27 +264,26 @@ void MainWindow::changeFileClicked()
 {
     QString filename = "";
 
-    switch (ui->comboBox->currentIndex())
-    {
+    switch (ui->comboBox->currentIndex()) {
     case 0: // backup
         filename = QFileDialog::getSaveFileName(this,
-                                                tr("Backup to…"),
-                                                QDir::homePath(),
-                                                tr("GnuPG backups (*.zip)"));
+            tr("Backup to…"),
+            QDir::homePath(),
+            tr("GnuPG backups (*.zip)"));
         filename = (filename == "" || filename.endsWith(".zip"))
-                ? filename
-                : (filename + ".zip");
+            ? filename
+            : (filename + ".zip");
         filenames.at(0) = filename;
         break;
 
     case 1: // restore
         filename = QFileDialog::getOpenFileName(this,
-                                                tr("Restore from…"),
-                                                QDir::homePath(),
-                                                tr("GnuPG backups (*.zip)"));
+            tr("Restore from…"),
+            QDir::homePath(),
+            tr("GnuPG backups (*.zip)"));
         filename = (filename == "" || filename.endsWith(".zip"))
-                ? filename
-                : (filename + ".zip");
+            ? filename
+            : (filename + ".zip");
         filenames.at(1) = filename;
         break;
     }
@@ -298,8 +293,7 @@ void MainWindow::changeFileClicked()
 
 void MainWindow::go()
 {
-    switch (ui->comboBox->currentIndex())
-    {
+    switch (ui->comboBox->currentIndex()) {
     case 0: // backup
         backupTo();
         break;
@@ -311,7 +305,7 @@ void MainWindow::go()
 
 void MainWindow::backupTo()
 {
-    map<QString, vector<uint8_t>> data;
+    map<QString, vector<uint8_t> > data;
     try {
         data = getFilesAndContents(gnupgDir);
     } catch (const GpgmeException&) {
@@ -338,7 +332,7 @@ void MainWindow::backupTo()
 
     auto fn_qba = ui->lineEdit->text().toUtf8();
     auto zipfile = zipOpen(fn_qba.data(), APPEND_STATUS_CREATE);
-    for (auto const& elem: data) {
+    for (auto const& elem : data) {
         auto this_qba = elem.first.toUtf8();
         zipOpenNewFileInZip(zipfile, this_qba.data(), NULL, NULL, 0, NULL, 0, NULL, Z_DEFLATED, Z_DEFAULT_COMPRESSION);
         zipWriteInFileInZip(zipfile, &elem.second[0], static_cast<uint32_t>(elem.second.size()));
@@ -348,12 +342,12 @@ void MainWindow::backupTo()
     zipClose(zipfile, comment.data());
 
     QMessageBox::information(this,
-                             tr("Success"),
-                             tr("You have successfully backed up your GnuPG user data."
-                                "\n\n"
-                                "Click ‘Ok’ to exit."),
-                             QMessageBox::Ok,
-                             QMessageBox::Ok);
+        tr("Success"),
+        tr("You have successfully backed up your GnuPG user data."
+           "\n\n"
+           "Click ‘Ok’ to exit."),
+        QMessageBox::Ok,
+        QMessageBox::Ok);
     qApp->exit(0);
 }
 
@@ -365,44 +359,43 @@ void MainWindow::restoreFrom()
         files = readSherpaFile(ui->lineEdit->text());
     } catch (const UncompressError&) {
         QMessageBox::information(this,
-                                 tr("File corruption"),
-                                 tr("An error occurred while uncompressing this file."),
-                                 QMessageBox::Ok,
-                                 QMessageBox::Ok);
+            tr("File corruption"),
+            tr("An error occurred while uncompressing this file."),
+            QMessageBox::Ok,
+            QMessageBox::Ok);
         return;
     } catch (const NotASherpa&) {
         QMessageBox::information(this,
-                                 tr("Not a GnuPG backup"),
-                                 tr("This file does not appear to hold a GnuPG backup profile."),
-                                 QMessageBox::Ok,
-                                 QMessageBox::Ok);
+            tr("Not a GnuPG backup"),
+            tr("This file does not appear to hold a GnuPG backup profile."),
+            QMessageBox::Ok,
+            QMessageBox::Ok);
         return;
     }
 
-    for (auto const& elem: files)
+    for (auto const& elem : files)
         qDebug() << elem.first << "    " << elem.second.size();
 
     QMessageBox::information(this,
-                             tr("Success"),
-                             tr("You have successfully restored your GnuPG user data."
-                                "\n\n"
-                                "Click ‘Ok’ to exit."),
-                             QMessageBox::Ok,
-                             QMessageBox::Ok);
+        tr("Success"),
+        tr("You have successfully restored your GnuPG user data."
+           "\n\n"
+           "Click ‘Ok’ to exit."),
+        QMessageBox::Ok,
+        QMessageBox::Ok);
     qApp->exit(0);
 }
 
 void MainWindow::updateUI()
 {
-    switch (ui->comboBox->currentIndex())
-    {
+    switch (ui->comboBox->currentIndex()) {
     case 0:
-        if (! QDir(gnupgDir).exists()) {
+        if (!QDir(gnupgDir).exists()) {
             QMessageBox::warning(this,
-                                 tr("No profile found"),
-                                 tr("There is no profile to back up."),
-                                 QMessageBox::Ok,
-                                 QMessageBox::Ok);
+                tr("No profile found"),
+                tr("There is no profile to back up."),
+                QMessageBox::Ok,
+                QMessageBox::Ok);
             ui->comboBox->setCurrentIndex(1);
             ui->lineEdit->setText("");
             ui->goBtn->setEnabled(false);
@@ -413,33 +406,29 @@ void MainWindow::updateUI()
         if (ui->lineEdit->text() != "") {
             auto qfi = QFileInfo(ui->lineEdit->text());
             auto dir = qfi.absoluteDir();
-            if (! (dir.exists() && dir.Writable)) {
+            if (!(dir.exists() && dir.Writable)) {
                 QMessageBox::information(this,
-                                         tr("Directory not writeable"),
-                                         tr("This directory is not writeable."),
-                                         QMessageBox::Ok,
-                                         QMessageBox::Ok);
+                    tr("Directory not writeable"),
+                    tr("This directory is not writeable."),
+                    QMessageBox::Ok,
+                    QMessageBox::Ok);
                 ui->goBtn->setEnabled(false);
                 ui->statusBar->showMessage(clickFile);
                 return;
             }
             if (qfi.isDir()) {
                 QMessageBox::information(this,
-                                         tr("Not a file"),
-                                         tr("Profiles cannot be backed up to a directory."),
-                                         QMessageBox::Ok,
-                                         QMessageBox::Ok);
+                    tr("Not a file"),
+                    tr("Profiles cannot be backed up to a directory."),
+                    QMessageBox::Ok,
+                    QMessageBox::Ok);
                 ui->goBtn->setEnabled(false);
                 ui->statusBar->showMessage(clickFile);
                 return;
             }
-            if (qfi.exists() &&
-                    QMessageBox::Cancel == QMessageBox::warning(this,
-                                                                tr("File already exists"),
-                                                                tr("This file already exists.  "
-                                                                   "If you continue, it will be overwritten."),
-                                                                QMessageBox::Ok | QMessageBox::Cancel,
-                                                                QMessageBox::Cancel)) {
+            if (qfi.exists() && QMessageBox::Cancel == QMessageBox::warning(this, tr("File already exists"), tr("This file already exists.  "
+                                                                                                                "If you continue, it will be overwritten."),
+                                                           QMessageBox::Ok | QMessageBox::Cancel, QMessageBox::Cancel)) {
                 ui->lineEdit->setText("");
                 ui->goBtn->setEnabled(false);
                 ui->statusBar->showMessage(clickFile);
@@ -453,12 +442,12 @@ void MainWindow::updateUI()
         }
         break;
     case 1:
-        if (! QDir(gnupgDir).exists()) {
+        if (!QDir(gnupgDir).exists()) {
             QMessageBox::warning(this,
-                                 tr("No profile found"),
-                                 tr("There is GnuPG profile folder to restore into."),
-                                 QMessageBox::Ok,
-                                 QMessageBox::Ok);
+                tr("No profile found"),
+                tr("There is GnuPG profile folder to restore into."),
+                QMessageBox::Ok,
+                QMessageBox::Ok);
             ui->lineEdit->setText("");
             ui->goBtn->setEnabled(false);
             ui->statusBar->showMessage("");
@@ -466,22 +455,22 @@ void MainWindow::updateUI()
         }
         if (ui->lineEdit->text() != "") {
             auto qfi = QFileInfo(ui->lineEdit->text());
-            if (! qfi.isFile()) {
+            if (!qfi.isFile()) {
                 QMessageBox::information(this,
-                                         tr("Not a file"),
-                                         tr("This is not a file."),
-                                         QMessageBox::Ok,
-                                         QMessageBox::Ok);
+                    tr("Not a file"),
+                    tr("This is not a file."),
+                    QMessageBox::Ok,
+                    QMessageBox::Ok);
                 ui->goBtn->setEnabled(false);
                 ui->statusBar->showMessage(clickFile);
                 return;
             }
-            if (! qfi.isReadable()) {
+            if (!qfi.isReadable()) {
                 QMessageBox::information(this,
-                                         tr("Not readable"),
-                                         tr("This file cannot be read."),
-                                         QMessageBox::Ok,
-                                         QMessageBox::Ok);
+                    tr("Not readable"),
+                    tr("This file cannot be read."),
+                    QMessageBox::Ok,
+                    QMessageBox::Ok);
                 ui->goBtn->setEnabled(false);
                 ui->statusBar->showMessage(clickFile);
                 return;
@@ -491,10 +480,10 @@ void MainWindow::updateUI()
             auto zipfile = unzOpen(fn_qba.data());
             if (NULL == zipfile) {
                 QMessageBox::information(this,
-                                         tr("Not a backup file"),
-                                         tr("This file does not contain a GnuPG backup."),
-                                         QMessageBox::Ok,
-                                         QMessageBox::Ok);
+                    tr("Not a backup file"),
+                    tr("This file does not contain a GnuPG backup."),
+                    QMessageBox::Ok,
+                    QMessageBox::Ok);
                 ui->goBtn->setEnabled(false);
                 ui->statusBar->showMessage(clickFile);
                 return;
@@ -506,12 +495,12 @@ void MainWindow::updateUI()
 
             QString version(&comment_buf[0]);
             qDebug() << "Comment string: " << version;
-            if (! version.startsWith("Sherpa")) {
+            if (!version.startsWith("Sherpa")) {
                 QMessageBox::information(this,
-                                         tr("Not a backup file"),
-                                         tr("This file does not contain a GnuPG backup."),
-                                         QMessageBox::Ok,
-                                         QMessageBox::Ok);
+                    tr("Not a backup file"),
+                    tr("This file does not contain a GnuPG backup."),
+                    QMessageBox::Ok,
+                    QMessageBox::Ok);
                 ui->goBtn->setEnabled(false);
                 ui->statusBar->showMessage(clickFile);
                 return;

@@ -39,8 +39,7 @@ void init_gpgme()
     auto err1 = gpgme_engine_check_version(GPGME_PROTOCOL_OpenPGP);
     auto err2 = gpgme_get_engine_info(&info);
 
-    if (! (gpg_err_code(err1) == GPG_ERR_NO_ERROR) &&
-          (gpg_err_code(err2) == GPG_ERR_NO_ERROR))
+    if (!(gpg_err_code(err1) == GPG_ERR_NO_ERROR) && (gpg_err_code(err2) == GPG_ERR_NO_ERROR))
         throw GnuPGNotFound();
 
     while (info && info->protocol != GPGME_PROTOCOL_OpenPGP)
@@ -60,34 +59,29 @@ void init_gpgme()
 }
 }
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
     QApplication a(argc, argv);
-    try
-    {
+    try {
         init_gpgme();
         MainWindow w;
         w.show();
         int rv = a.exec();
         gpgme_release(ctx);
         return rv;
-    }
-    catch (const GnuPGNotFound&)
-    {
+    } catch (const GnuPGNotFound&) {
         QMessageBox::critical(nullptr,
-                              "Could not find GnuPG",
-                              "GnuPG doesn't appear to be installed.",
-                              QMessageBox::Abort,
-                              QMessageBox::Abort);
+            "Could not find GnuPG",
+            "GnuPG doesn't appear to be installed.",
+            QMessageBox::Abort,
+            QMessageBox::Abort);
         return 1;
-    }
-    catch (const GpgmeException&)
-    {
+    } catch (const GpgmeException&) {
         QMessageBox::critical(nullptr,
-                              "GPGME error",
-                              "GPGME could not be initialized.",
-                              QMessageBox::Abort,
-                              QMessageBox::Abort);
+            "GPGME error",
+            "GPGME could not be initialized.",
+            QMessageBox::Abort,
+            QMessageBox::Abort);
         return 2;
     }
 }

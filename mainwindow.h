@@ -18,11 +18,11 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include "gpgme.h"
 #include <QMainWindow>
+#include <array>
 #include <cstdint>
 #include <exception>
-#include <array>
-#include "gpgme.h"
 
 namespace Ui {
 class MainWindow;
@@ -36,7 +36,10 @@ class GnuPGNotFound : public std::exception {
 
 class GpgmeException : public std::exception {
 public:
-    GpgmeException(gpgme_error_t e) : error { e } {}
+    GpgmeException(gpgme_error_t e)
+        : error{ e }
+    {
+    }
     const char* what() const noexcept { return "gpgme error"; }
     gpgme_error_t error;
 };
@@ -49,17 +52,15 @@ class NotASherpa : public std::exception {
     const char* what() const noexcept { return "not a sherpa file"; }
 };
 
-class MainWindow : public QMainWindow
-{
+class MainWindow : public QMainWindow {
     Q_OBJECT
 
 public:
-    explicit MainWindow(QWidget *parent = 0);
+    explicit MainWindow(QWidget* parent = 0);
     ~MainWindow();
 
 private:
-    enum struct GpgType
-    {
+    enum struct GpgType {
         classic = 0,
         stable = 1,
         modern = 2
@@ -67,7 +68,7 @@ private:
     void backupTo();
     void restoreFrom();
     void updateUI();
-    Ui::MainWindow *ui;
+    Ui::MainWindow* ui;
     QString gnupgDir;
     std::array<QString, 2> filenames;
     GpgType gpgType;
