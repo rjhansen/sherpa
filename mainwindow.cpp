@@ -142,7 +142,7 @@ map<QString, QByteArray> readSherpaFile(QString zipfilename)
     int zip_err;
 
     unzGetGlobalComment(zipfile, &comment_buf[0], comment_buf.size());
-    QString version(comment_buf.begin());
+    QString version(&comment_buf[0]);
     if (! version.startsWith("Sherpa")) {
         unzClose(zipfile);
         throw NotASherpa();
@@ -189,7 +189,7 @@ map<QString, QByteArray> readSherpaFile(QString zipfilename)
             throw UncompressError();
         }
 
-        rv[filename.begin()] = uncompressed;
+        rv[QString(&filename[0])] = uncompressed;
         zip_err = unzGoToNextFile(zipfile);
     }
     unzClose(zipfile);
@@ -487,7 +487,7 @@ void MainWindow::updateUI()
             unzGetGlobalComment(zipfile, &comment_buf[0], comment_buf.size());
             unzClose(zipfile);
 
-            QString version(comment_buf.begin());
+            QString version(&comment_buf[0]);
             qDebug() << "Comment string: " << version;
             if (! version.startsWith("Sherpa")) {
                 QMessageBox::information(this,
