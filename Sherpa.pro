@@ -1,9 +1,3 @@
-#-------------------------------------------------
-#
-# Project created by QtCreator 2016-12-03T16:56:12
-#
-#-------------------------------------------------
-
 QT       += core gui
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
@@ -33,6 +27,9 @@ unix {
     LIBS += -lminizip -lgpgme -lassuan -lgpg-error
 }
 
+# Using Homebrew to provide minizip, as well as my own
+# homebuilt gpgme.  Use macdeployqt to automagically
+# package all the necessary libs into the Sherpa bundle.
 osx {
     INCLUDEPATH += /usr/local/Cellar/minizip/1.1/include
     INCLUDEPATH += /Users/rjh/include
@@ -47,3 +44,6 @@ SOURCES += main.cpp\
 HEADERS  += mainwindow.h
 
 FORMS    += mainwindow.ui
+
+DISTFILES += \
+    LICENSE
