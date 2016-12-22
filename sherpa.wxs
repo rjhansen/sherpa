@@ -1,0 +1,199 @@
+<?xml version='1.0' encoding='windows-1252'?>
+<Wix xmlns='http://schemas.microsoft.com/wix/2006/wi'>
+    <Product 
+		Name='Sherpa 0.3' 
+		Manufacturer='Robert Hansen'
+        Id='*'
+        UpgradeCode='81539CDB-900C-4A59-AF22-06D2FDF09964'
+        Language='1033' 
+		Codepage='1252' 
+		Version='0.3.0'>		
+		<Package 
+			Id='*' 
+			Keywords='Installer' 
+			Description="Sherpa 0.3 Installer"
+			Comments='Sherpa is released under the ISC License' 
+			Manufacturer='Robert Hansen"'
+			InstallerVersion='100' 
+			Languages='1033' 
+			Compressed='yes' 
+			SummaryCodepage='1252' />
+		<Media 
+			Id='1' 
+			Cabinet='Sherpa.cab' 
+			EmbedCab='yes' 
+			DiskPrompt='CD-ROM #1' />
+		<Property 
+			Id='DiskPrompt' 
+			Value="Sherpa 0.3 Installation [1]" />
+		<Property Id="WIXUI_INSTALLDIR" Value="INSTALLDIR" />
+		<UIRef Id="WixUI_Minimal"/>
+		<WixVariable Id="WixUILicenseRtf" Value="build\License.rtf" />
+		<Directory 
+			Id='TARGETDIR' 
+			Name='SourceDir'>
+			<Directory Id="ProgramMenuFolder">
+				<Directory 
+					Id="ApplicationProgramsFolder" 
+					Name="Sherpa"/>
+				<Directory 
+					Id="ProgramMenuDir" 
+					Name="Sherpa">
+					<Component Id="ProgramMenuDir"
+						Guid="A7D653D2-3986-479F-A8AB-4FA296A66E38">
+						<RemoveFolder 
+							Id='ProgramMenuDir' 
+							On='uninstall' />
+					</Component>
+				</Directory>
+			</Directory>
+			<Directory 
+				Id='ProgramFilesFolder' 
+				Name='PFiles'>
+				<Directory 
+					Id='INSTALLDIR' 
+					Name='Sherpa'>
+					<Component 
+						Id="c_gpgmelauncher" 
+						Guid="*">
+						<File 
+							Id='gpgmelauncher' 
+							Name='gpgme-w32spawn.exe' 
+							DiskId='1' 
+							Source='build\gpgme-w32spawn.exe'
+							KeyPath="yes"/>
+					</Component>
+					<Component
+						Id="c_libassuan"
+						Guid="*">
+						<File 
+							Id='libassuan' 
+							Name='libassuan-0.dll' 
+							DiskId='1' 
+							Source='build\libassuan-0.dll'
+							KeyPath="yes" />
+					</Component>
+					<Component
+						Id="c_libgpgerror"
+						Guid="*">
+						<File 
+							Id='libgpgerror' 
+							Name='libgpg-error-0.dll'
+							DiskId='1' 
+							Source='build\libgpg-error-0.dll' 
+							KeyPath="yes" />
+					</Component>
+					<Component
+						Id="c_libgpgme"
+						Guid="*">
+						<File 
+							Id='libgpgme' 
+							Name='libgpgme-11.dll'
+							DiskId='1' 
+							Source='build\libgpgme-11.dll'
+							KeyPath="yes"/>
+					</Component>
+					<Component
+						Id="c_qt5core"
+						Guid="*">
+						<File 
+							Id='qt5core' 
+							Name='Qt5Core.dll' 
+							DiskId='1' 
+							Source='build\Qt5Core.dll'
+							KeyPath="yes"/>
+					</Component>
+					<Component
+						Id="c_qt5gui"
+						Guid="*">
+						<File 
+							Id='qt5gui' 
+							Name='Qt5Gui.dll' 
+							DiskId='1' 
+							Source='build\Qt5Gui.dll'
+							KeyPath="yes"/>
+					</Component>
+					<Component
+						Id="c_qt5widgets"
+						Guid="*">
+						<File 
+							Id='qt5widgets' 
+							Name='Qt5Widgets.dll' 
+							DiskId='1' 
+							Source='build\Qt5Widgets.dll'
+							KeyPath="yes"/>
+					</Component>
+					<Component
+						Id="c_zlib"
+						Guid="*">
+						<File 
+							Id='zlib' 
+							Name='zlib1.dll' 
+							DiskId='1' 
+							Source='build\zlib1.dll'
+							KeyPath="yes"/>
+					</Component>
+					<Component
+						Id="c_sherpa"
+						Guid="*">
+						<File 
+							Id='sherpa' 
+							Name='Sherpa.exe' 
+							DiskId='1' 
+							Source='build\Sherpa.exe'
+							KeyPath="yes"/>
+					</Component>
+				</Directory>
+			</Directory>
+			<Directory Id="DesktopFolder" Name="Desktop" />
+		</Directory>
+		
+		<DirectoryRef 
+			Id="ApplicationProgramsFolder">
+			<Component 
+				Id="ApplicationShortcut" Guid="*">
+				<Shortcut 
+					Id="SherpaShortcut" 
+					Name="Sherpa"
+					Description="A GnuPG profile migrator"
+					Target="[#sherpa]"
+					WorkingDirectory="APPLICATIONROOTDIRECTORY"/>
+				<RemoveFolder 
+					Id="ApplicationProgramsFolder" 
+					On="uninstall"/>
+				<RegistryValue 
+					Root="HKCU" 
+					Key="Software\Robert Hansen\Sherpa" 
+					Name="installed" 
+					Type="integer" 
+					Value="1" 
+					KeyPath="yes"/>
+			</Component>
+		</DirectoryRef>
+	
+		<Feature 
+			Id='Complete' 
+			Title="Sherpa 0.3"
+			Description="The complete package"
+			ConfigurableDirectory="INSTALLDIR"
+			Level='1'>
+			<Feature 
+				Id="App" 
+				Title="Sherpa"
+				Description="The application"
+				Level="1">
+				<ComponentRef Id='c_sherpa' />
+				<ComponentRef Id='c_libassuan' />
+				<ComponentRef Id='c_libgpgerror' />
+				<ComponentRef Id='c_libgpgme' />
+				<ComponentRef Id='c_gpgmelauncher' />
+				<ComponentRef Id='c_qt5widgets' />
+				<ComponentRef Id='c_qt5core' />
+				<ComponentRef Id='c_qt5gui' />
+				<ComponentRef Id='c_zlib' /> 
+				<ComponentRef Id='ProgramMenuDir' />
+				<ComponentRef Id="ApplicationShortcut" />
+			</Feature>
+		</Feature>
+	</Product>
+</Wix>
