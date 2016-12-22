@@ -33,6 +33,7 @@
 #include <string>
 #include <vector>
 
+#include "aboutdialog.h"
 #include "minizip/unzip.h"
 #include "minizip/zip.h"
 
@@ -243,6 +244,7 @@ MainWindow::MainWindow(QWidget* parent)
         this,
         &MainWindow::comboChanged);
     connect(ui->actionQuit, &QAction::triggered, qApp, &QApplication::quit);
+    connect(ui->actionAbout, &QAction::triggered, [=]() { auto x = new AboutDialog(this); x->show(); });
     connect(ui->quitBtn, &QPushButton::clicked, qApp, &QApplication::quit);
     connect(ui->goBtn, &QPushButton::clicked, this, &MainWindow::go);
 
@@ -293,6 +295,7 @@ void MainWindow::changeFileClicked()
 
 void MainWindow::go()
 {
+    ui->goBtn->setEnabled(false);
     switch (ui->comboBox->currentIndex()) {
     case 0: // backup
         backupTo();
@@ -301,6 +304,7 @@ void MainWindow::go()
         restoreFrom();
         break;
     }
+    ui->goBtn->setEnabled(true);
 }
 
 void MainWindow::backupTo()
@@ -309,8 +313,14 @@ void MainWindow::backupTo()
     try {
         data = getFilesAndContents(gnupgDir);
     } catch (const GpgmeException&) {
-        // RBF exception handling
-        return;
+        QMessageBox::critical(this,
+                              tr("A haiku for you!"),
+                              tr("Good days and bad days.\n"
+                                 "GPGME’s having\n"
+                                 "The latter.  Error!\n\n"),
+                              QMessageBox::Abort,
+                              QMessageBox::Abort);
+        qApp->exit(1);
     }
 
     QString version = "Sherpa 1.0 backing up GnuPG ";
@@ -373,8 +383,44 @@ void MainWindow::restoreFrom()
         return;
     }
 
-    for (auto const& elem : files)
-        qDebug() << elem.first << "    " << elem.second.size();
+    for (auto const& elem : files) {
+        if (elem.first.endsWith(".bin"))
+            continue;
+        QString fn(gnupgDir + QDir::separator() + elem.first);
+        auto contents = elem.second;
+        QFileInfo qfi(fn);
+        QDir dir = qfi.absoluteDir();
+        if (! dir.exists())
+            dir.mkpath(dir.canonicalPath());
+        QFile fh(fn);
+        if (fh.exists())
+            fh.remove();
+        fh.open(QFile::WriteOnly);
+        fh.write(contents);
+        fh.close();
+    }
+
+    auto fn_qba = ui->lineEdit->text().toUtf8();
+    auto zipfile = unzOpen(fn_qba.data());
+    std::array<char, 80> comment_buf;
+    unzGetGlobalComment(zipfile, &comment_buf[0], comment_buf.size());
+    unzClose(zipfile);
+
+    QString version(&comment_buf[0]);
+    if ((gpgType == GpgType::modern && !version.endsWith("Modern")) ||
+            (gpgType != GpgType::modern && version.endsWith("Modern")))
+    {
+        gpgme_data_t foo;
+        const QByteArray& bar = files["public_keys.bin"];
+        gpgme_data_new_from_mem(&foo, bar.data(), bar.size(), 0);
+        gpgme_op_import(ctx, foo);
+        gpgme_data_release(foo);
+
+        const QByteArray& baz = files["private_keys.bin"];
+        gpgme_data_new_from_mem(&foo, baz.data(), baz.size(), 0);
+        gpgme_op_import(ctx, foo);
+        gpgme_data_release(foo);
+    }
 
     QMessageBox::information(this,
         tr("Success"),
@@ -399,6 +445,7 @@ void MainWindow::updateUI()
             ui->comboBox->setCurrentIndex(1);
             ui->lineEdit->setText("");
             ui->goBtn->setEnabled(false);
+            ui->fileBtn->setEnabled(true);
             ui->statusBar->showMessage(clickFile);
             return;
         }
@@ -494,7 +541,6 @@ void MainWindow::updateUI()
             unzClose(zipfile);
 
             QString version(&comment_buf[0]);
-            qDebug() << "Comment string: " << version;
             if (!version.startsWith("Sherpa")) {
                 QMessageBox::information(this,
                     tr("Not a backup file"),
