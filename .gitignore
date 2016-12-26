@@ -9,3 +9,4 @@ debug/*
 *.deb
 Sherpa.pro.user
 *~
+mkwin32.py

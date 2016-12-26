@@ -11,8 +11,7 @@ import sys
 # To use this with GitHub's Git Shell, add the following
 # to your Documents\WindowsPowerShell\profile.ps1 file.
 #
-# pushd 'C:\Program Files (x86)\Microsoft Visual Studio 14.0\Common7\Tools'    
-cmd /c "vsvars32.bat&set" |
+# pushd 'C:\Program Files (x86)\Microsoft Visual Studio 14.0\Common7\Tools' cmd /c "vsvars32.bat&set" |
 # foreach {
 #   if ($_ -match "=") {
 #     $v = $_.split("="); set-item -force -path "ENV:\$($v[0])"  -value "$($v[1])"
@@ -23,14 +22,15 @@ cmd /c "vsvars32.bat&set" |
 
 
 # User-serviceable parts here
-qtdir = r"C:\Qt\Qt5.7.1\5.7\msvc2015\bin\\"
-vc14dir = r"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\\"
-w32sdkdir = r"C:\Program Files (x86)\Microsoft SDKs\Windows\v7.1A\Bin\\"
+qtdir = r"D:\Qt\Qt5.7.1\5.7\msvc2015\bin\\"
+vc14dir = r"D:\Microsoft Visual Studio 14.0\VC\bin\\"
+w32sdkdir = r"C:\Program Files (x86)\Windows Kits\10\bin\x86\\"
 wixdir = r"C:\Program Files (x86)\WiX Toolset v3.10\bin\\"
 gnupgdir = r"C:\Program Files (x86)\GnuPG\bin\\"
 msvcrtfile = r"C:\Program Files (x86)\Common Files\Merge Modules\\" +\
     "Microsoft_VC140_CRT_x86.msm"
 zlibdir = r"C:\zlib\\"
+shouldSign = False
 # End user-serviceable parts
 
 cmd = {
@@ -94,11 +94,13 @@ shutil.copy(msvcrtfile, "release")
 shutil.copy("License.rtf", "release")
 os.rename("release", "build")
 
-subprocess.Popen(signcmd).wait()
+if shouldSign:
+    subprocess.Popen(signcmd).wait()
 subprocess.Popen(deploycmd).wait()
 subprocess.Popen(candlecmd).wait()
 subprocess.Popen(lightcmd).wait()
-subprocess.Popen(signmsi).wait()
+if shouldSign:
+    subprocess.Popen(signmsi).wait()
 
 os.rename("Sherpa.msi", "sherpa-" + version + ".msi")
 
