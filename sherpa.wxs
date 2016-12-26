@@ -1,145 +1,498 @@
 <?xml version='1.0' encoding='windows-1252'?>
 <Wix xmlns='http://schemas.microsoft.com/wix/2006/wi'>
-    <Product 
-		Name='Sherpa 0.3' 
+    <Product
+		Name='Sherpa 0.3'
 		Manufacturer='Robert Hansen'
         Id='*'
         UpgradeCode='81539CDB-900C-4A59-AF22-06D2FDF09964'
-        Language='1033' 
-		Codepage='1252' 
-		Version='0.3.0'>		
-		<Package 
-			Id='*' 
-			Keywords='Installer' 
+        Language='1033'
+		Codepage='1252'
+		Version='0.3.0'>
+		<Package
+			Id='*'
+			Keywords='Installer'
 			Description="Sherpa 0.3 Installer"
-			Comments='Sherpa is released under the ISC License' 
+			Comments='Sherpa is released under the ISC License'
 			Manufacturer='Robert Hansen"'
-			InstallerVersion='100' 
-			Languages='1033' 
-			Compressed='yes' 
+			InstallerVersion='301'
+			Languages='1033'
+			Compressed='yes'
 			SummaryCodepage='1252' />
-		<Media 
-			Id='1' 
-			Cabinet='Sherpa.cab' 
-			EmbedCab='yes' 
+		<Media
+			Id='1'
+			Cabinet='Sherpa.cab'
+			EmbedCab='yes'
 			DiskPrompt='CD-ROM #1' />
-		<Property 
-			Id='DiskPrompt' 
+		<Property
+			Id='DiskPrompt'
 			Value="Sherpa 0.3 Installation [1]" />
 		<Property Id="WIXUI_INSTALLDIR" Value="INSTALLDIR" />
 		<UIRef Id="WixUI_Minimal"/>
 		<WixVariable Id="WixUILicenseRtf" Value="build\License.rtf" />
-		<Directory 
-			Id='TARGETDIR' 
+		<Directory
+			Id='TARGETDIR'
 			Name='SourceDir'>
+
+            <Merge
+                Id="VCRedist"
+                SourceFile="build\Microsoft_VC140_CRT_x86.msm"
+                DiskId="1"
+                Language="0"/>
+
 			<Directory Id="ProgramMenuFolder">
-				<Directory 
-					Id="ApplicationProgramsFolder" 
+				<Directory
+					Id="ApplicationProgramsFolder"
 					Name="Sherpa"/>
-				<Directory 
-					Id="ProgramMenuDir" 
+				<Directory
+					Id="ProgramMenuDir"
 					Name="Sherpa">
 					<Component Id="ProgramMenuDir"
 						Guid="A7D653D2-3986-479F-A8AB-4FA296A66E38">
-						<RemoveFolder 
-							Id='ProgramMenuDir' 
+						<RemoveFolder
+							Id='ProgramMenuDir'
 							On='uninstall' />
 					</Component>
 				</Directory>
 			</Directory>
-			<Directory 
-				Id='ProgramFilesFolder' 
+			<Directory
+				Id='ProgramFilesFolder'
 				Name='PFiles'>
-				<Directory 
-					Id='INSTALLDIR' 
+				<Directory
+					Id='INSTALLDIR'
 					Name='Sherpa'>
-					<Component 
-						Id="c_gpgmelauncher" 
+                    <Directory
+                        Id="iconengines"
+                        Name="iconengines">
+                        <Component
+    						Id="c_qsvgicon"
+    						Guid="*">
+    						<File
+    							Id='qsvgicon'
+    							Name='qsvgicon.dll'
+    							DiskId='1'
+    							Source='build\iconengines\qsvgicon.dll'
+    							KeyPath="yes"/>
+                        </Component>
+                    </Directory>
+                    <Directory
+                        Id="imageformats"
+                        Name="imageformats">
+                        <Component
+    						Id="c_qdds"
+    						Guid="*">
+    						<File
+    							Id='qdds'
+    							Name='qdds.dll'
+    							DiskId='1'
+    							Source='build\imageformats\qdds.dll'
+    							KeyPath="yes"/>
+                        </Component>
+                        <Component
+    						Id="c_qgif"
+    						Guid="*">
+    						<File
+    							Id='qgif'
+    							Name='qgif.dll'
+    							DiskId='1'
+    							Source='build\imageformats\qgif.dll'
+    							KeyPath="yes"/>
+                        </Component>
+                        <Component
+    						Id="c_qicns"
+    						Guid="*">
+    						<File
+    							Id='qicns'
+    							Name='qicns.dll'
+    							DiskId='1'
+    							Source='build\imageformats\qicns.dll'
+    							KeyPath="yes"/>
+                        </Component>
+                        <Component
+    						Id="c_qico"
+    						Guid="*">
+    						<File
+    							Id='qico'
+    							Name='qico.dll'
+    							DiskId='1'
+    							Source='build\imageformats\qico.dll'
+    							KeyPath="yes"/>
+                        </Component>
+                        <Component
+    						Id="c_qjpeg"
+    						Guid="*">
+    						<File
+    							Id='qjpeg'
+    							Name='qjpeg.dll'
+    							DiskId='1'
+    							Source='build\imageformats\qjpeg.dll'
+    							KeyPath="yes"/>
+                        </Component>
+                        <Component
+    						Id="c_qsvg"
+    						Guid="*">
+    						<File
+    							Id='qsvg'
+    							Name='qsvg.dll'
+    							DiskId='1'
+    							Source='build\imageformats\qsvg.dll'
+    							KeyPath="yes"/>
+                        </Component>
+                        <Component
+    						Id="c_qtga"
+    						Guid="*">
+    						<File
+    							Id='qtga'
+    							Name='qtga.dll'
+    							DiskId='1'
+    							Source='build\imageformats\qtga.dll'
+    							KeyPath="yes"/>
+                        </Component>
+                        <Component
+    						Id="c_qtiff"
+    						Guid="*">
+    						<File
+    							Id='qtiff'
+    							Name='qtiff.dll'
+    							DiskId='1'
+    							Source='build\imageformats\qtiff.dll'
+    							KeyPath="yes"/>
+                        </Component>
+                        <Component
+    						Id="c_qwbmp"
+    						Guid="*">
+    						<File
+    							Id='qwbmp'
+    							Name='qwbmp.dll'
+    							DiskId='1'
+    							Source='build\imageformats\qwbmp.dll'
+    							KeyPath="yes"/>
+                        </Component>
+                        <Component
+    						Id="c_qwebp"
+    						Guid="*">
+    						<File
+    							Id='qwebp'
+    							Name='qwebp.dll'
+    							DiskId='1'
+    							Source='build\imageformats\qwebp.dll'
+    							KeyPath="yes"/>
+                        </Component>
+                    </Directory>
+                    <Directory
+                        Id="platforms"
+                        Name="platforms">
+                        <Component
+    						Id="c_qwindows"
+    						Guid="*">
+    						<File
+    							Id='qwindows'
+    							Name='qwindows.dll'
+    							DiskId='1'
+    							Source='build\platforms\qwindows.dll'
+    							KeyPath="yes"/>
+                        </Component>
+                    </Directory>
+                    <Directory
+                        Id="translations"
+                        Name="translations">
+                        <Component
+    						Id="c_qt_ca"
+    						Guid="*">
+    						<File
+    							Id='qt_ca'
+    							Name='qt_ca.qm'
+    							DiskId='1'
+    							Source='build\translations\qt_ca.qm'
+    							KeyPath="yes"/>
+                        </Component>
+                        <Component
+    						Id="c_qt_cs"
+    						Guid="*">
+    						<File
+    							Id='qt_cs'
+    							Name='qt_cs.qm'
+    							DiskId='1'
+    							Source='build\translations\qt_cs.qm'
+    							KeyPath="yes"/>
+                        </Component>
+                        <Component
+    						Id="c_qt_de"
+    						Guid="*">
+    						<File
+    							Id='qt_de'
+    							Name='qt_de.qm'
+    							DiskId='1'
+    							Source='build\translations\qt_de.qm'
+    							KeyPath="yes"/>
+                        </Component>
+                        <Component
+    						Id="c_qt_en"
+    						Guid="*">
+    						<File
+    							Id='qt_en'
+    							Name='qt_en.qm'
+    							DiskId='1'
+    							Source='build\translations\qt_en.qm'
+    							KeyPath="yes"/>
+                        </Component>
+                        <Component
+    						Id="c_qt_fi"
+    						Guid="*">
+    						<File
+    							Id='qt_fi'
+    							Name='qt_fi.qm'
+    							DiskId='1'
+    							Source='build\translations\qt_fi.qm'
+    							KeyPath="yes"/>
+                        </Component>
+                        <Component
+    						Id="c_qt_fr"
+    						Guid="*">
+    						<File
+    							Id='qt_fr'
+    							Name='qt_fr.qm'
+    							DiskId='1'
+    							Source='build\translations\qt_fr.qm'
+    							KeyPath="yes"/>
+                        </Component>
+                        <Component
+    						Id="c_qt_he"
+    						Guid="*">
+    						<File
+    							Id='qt_he'
+    							Name='qt_he.qm'
+    							DiskId='1'
+    							Source='build\translations\qt_he.qm'
+    							KeyPath="yes"/>
+                        </Component>
+                        <Component
+    						Id="c_qt_hu"
+    						Guid="*">
+    						<File
+    							Id='qt_hu'
+    							Name='qt_hu.qm'
+    							DiskId='1'
+    							Source='build\translations\qt_hu.qm'
+    							KeyPath="yes"/>
+                        </Component>
+                        <Component
+    						Id="c_qt_it"
+    						Guid="*">
+    						<File
+    							Id='qt_it'
+    							Name='qt_it.qm'
+    							DiskId='1'
+    							Source='build\translations\qt_it.qm'
+    							KeyPath="yes"/>
+                        </Component>
+                        <Component
+    						Id="c_qt_ja"
+    						Guid="*">
+    						<File
+    							Id='qt_ja'
+    							Name='qt_ja.qm'
+    							DiskId='1'
+    							Source='build\translations\qt_ja.qm'
+    							KeyPath="yes"/>
+                        </Component>
+                        <Component
+    						Id="c_qt_ko"
+    						Guid="*">
+    						<File
+    							Id='qt_ko'
+    							Name='qt_ko.qm'
+    							DiskId='1'
+    							Source='build\translations\qt_ko.qm'
+    							KeyPath="yes"/>
+                        </Component>
+                        <Component
+    						Id="c_qt_lv"
+    						Guid="*">
+    						<File
+    							Id='qt_lv'
+    							Name='qt_lv.qm'
+    							DiskId='1'
+    							Source='build\translations\qt_lv.qm'
+    							KeyPath="yes"/>
+                        </Component>
+                        <Component
+    						Id="c_qt_pl"
+    						Guid="*">
+    						<File
+    							Id='qt_pl'
+    							Name='qt_pl.qm'
+    							DiskId='1'
+    							Source='build\translations\qt_pl.qm'
+    							KeyPath="yes"/>
+                        </Component>
+                        <Component
+    						Id="c_qt_ru"
+    						Guid="*">
+    						<File
+    							Id='qt_ru'
+    							Name='qt_ru.qm'
+    							DiskId='1'
+    							Source='build\translations\qt_ru.qm'
+    							KeyPath="yes"/>
+                        </Component>
+                        <Component
+    						Id="c_qt_sk"
+    						Guid="*">
+    						<File
+    							Id='qt_sk'
+    							Name='qt_sk.qm'
+    							DiskId='1'
+    							Source='build\translations\qt_sk.qm'
+    							KeyPath="yes"/>
+                        </Component>
+                        <Component
+    						Id="c_qt_uk"
+    						Guid="*">
+    						<File
+    							Id='qt_uk'
+    							Name='qt_uk.qm'
+    							DiskId='1'
+    							Source='build\translations\qt_uk.qm'
+    							KeyPath="yes"/>
+                        </Component>
+                    </Directory>
+                    <Component
+						Id="c_d3dcompiler"
 						Guid="*">
-						<File 
-							Id='gpgmelauncher' 
-							Name='gpgme-w32spawn.exe' 
-							DiskId='1' 
+						<File
+							Id='d3dcompiler'
+							Name='d3dcompiler_47.dll'
+							DiskId='1'
+							Source='build\d3dcompiler_47.dll'
+							KeyPath="yes"/>
+					</Component>
+                    <Component
+						Id="c_libegl"
+						Guid="*">
+						<File
+							Id='libegl'
+							Name='libEGL.dll'
+							DiskId='1'
+							Source='build\libEGL.dll'
+							KeyPath="yes"/>
+					</Component>
+                    <Component
+						Id="c_libgles"
+						Guid="*">
+						<File
+							Id='libgles'
+							Name='libGLESV2.dll'
+							DiskId='1'
+							Source='build\libGLESV2.dll'
+							KeyPath="yes"/>
+					</Component>
+                    <Component
+						Id="c_opengl32sw"
+						Guid="*">
+						<File
+							Id='opengl32sw'
+							Name='opengl32sw.dll'
+							DiskId='1'
+							Source='build\opengl32sw.dll'
+							KeyPath="yes"/>
+					</Component>
+                    <Component
+						Id="c_qt5svg"
+						Guid="*">
+						<File
+							Id='qt5svg'
+							Name='Qt5Svg.dll'
+							DiskId='1'
+							Source='build\Qt5Svg.dll'
+							KeyPath="yes"/>
+					</Component>
+					<Component
+						Id="c_gpgmelauncher"
+						Guid="*">
+						<File
+							Id='gpgmelauncher'
+							Name='gpgme-w32spawn.exe'
+							DiskId='1'
 							Source='build\gpgme-w32spawn.exe'
 							KeyPath="yes"/>
 					</Component>
 					<Component
 						Id="c_libassuan"
 						Guid="*">
-						<File 
-							Id='libassuan' 
-							Name='libassuan-0.dll' 
-							DiskId='1' 
+						<File
+							Id='libassuan'
+							Name='libassuan-0.dll'
+							DiskId='1'
 							Source='build\libassuan-0.dll'
 							KeyPath="yes" />
 					</Component>
 					<Component
 						Id="c_libgpgerror"
 						Guid="*">
-						<File 
-							Id='libgpgerror' 
+						<File
+							Id='libgpgerror'
 							Name='libgpg-error-0.dll'
-							DiskId='1' 
-							Source='build\libgpg-error-0.dll' 
+							DiskId='1'
+							Source='build\libgpg-error-0.dll'
 							KeyPath="yes" />
 					</Component>
 					<Component
 						Id="c_libgpgme"
 						Guid="*">
-						<File 
-							Id='libgpgme' 
+						<File
+							Id='libgpgme'
 							Name='libgpgme-11.dll'
-							DiskId='1' 
+							DiskId='1'
 							Source='build\libgpgme-11.dll'
 							KeyPath="yes"/>
 					</Component>
 					<Component
 						Id="c_qt5core"
 						Guid="*">
-						<File 
-							Id='qt5core' 
-							Name='Qt5Core.dll' 
-							DiskId='1' 
+						<File
+							Id='qt5core'
+							Name='Qt5Core.dll'
+							DiskId='1'
 							Source='build\Qt5Core.dll'
 							KeyPath="yes"/>
 					</Component>
 					<Component
 						Id="c_qt5gui"
 						Guid="*">
-						<File 
-							Id='qt5gui' 
-							Name='Qt5Gui.dll' 
-							DiskId='1' 
+						<File
+							Id='qt5gui'
+							Name='Qt5Gui.dll'
+							DiskId='1'
 							Source='build\Qt5Gui.dll'
 							KeyPath="yes"/>
 					</Component>
 					<Component
 						Id="c_qt5widgets"
 						Guid="*">
-						<File 
-							Id='qt5widgets' 
-							Name='Qt5Widgets.dll' 
-							DiskId='1' 
+						<File
+							Id='qt5widgets'
+							Name='Qt5Widgets.dll'
+							DiskId='1'
 							Source='build\Qt5Widgets.dll'
 							KeyPath="yes"/>
 					</Component>
 					<Component
 						Id="c_zlib"
 						Guid="*">
-						<File 
-							Id='zlib' 
-							Name='zlib1.dll' 
-							DiskId='1' 
+						<File
+							Id='zlib'
+							Name='zlib1.dll'
+							DiskId='1'
 							Source='build\zlib1.dll'
 							KeyPath="yes"/>
 					</Component>
 					<Component
 						Id="c_sherpa"
 						Guid="*">
-						<File 
-							Id='sherpa' 
-							Name='Sherpa.exe' 
-							DiskId='1' 
+						<File
+							Id='sherpa'
+							Name='Sherpa.exe'
+							DiskId='1'
 							Source='build\Sherpa.exe'
 							KeyPath="yes"/>
 					</Component>
@@ -147,41 +500,82 @@
 			</Directory>
 			<Directory Id="DesktopFolder" Name="Desktop" />
 		</Directory>
-		
-		<DirectoryRef 
+
+		<DirectoryRef
 			Id="ApplicationProgramsFolder">
-			<Component 
+			<Component
 				Id="ApplicationShortcut" Guid="*">
-				<Shortcut 
-					Id="SherpaShortcut" 
+				<Shortcut
+					Id="SherpaShortcut"
 					Name="Sherpa"
 					Description="A GnuPG profile migrator"
 					Target="[#sherpa]"
 					WorkingDirectory="APPLICATIONROOTDIRECTORY"/>
-				<RemoveFolder 
-					Id="ApplicationProgramsFolder" 
+				<RemoveFolder
+					Id="ApplicationProgramsFolder"
 					On="uninstall"/>
-				<RegistryValue 
-					Root="HKCU" 
-					Key="Software\Robert Hansen\Sherpa" 
-					Name="installed" 
-					Type="integer" 
-					Value="1" 
+				<RegistryValue
+					Root="HKCU"
+					Key="Software\Robert Hansen\Sherpa"
+					Name="installed"
+					Type="integer"
+					Value="1"
 					KeyPath="yes"/>
 			</Component>
 		</DirectoryRef>
-	
-		<Feature 
-			Id='Complete' 
+
+        <Feature
+            Id="VCRedist"
+            Title="Visual C++ 14.0 Runtime"
+            AllowAdvertise="no"
+            Display="hidden"
+            Level="1">
+            <MergeRef Id="VCRedist"/>
+        </Feature>
+		<Feature
+			Id='Complete'
 			Title="Sherpa 0.3"
 			Description="The complete package"
 			ConfigurableDirectory="INSTALLDIR"
 			Level='1'>
-			<Feature 
-				Id="App" 
+			<Feature
+				Id="App"
 				Title="Sherpa"
 				Description="The application"
 				Level="1">
+                <ComponentRef Id='c_qsvgicon' />
+                <ComponentRef Id='c_qdds' />
+                <ComponentRef Id='c_qgif' />
+                <ComponentRef Id='c_qicns' />
+                <ComponentRef Id='c_qico' />
+                <ComponentRef Id='c_qjpeg' />
+                <ComponentRef Id='c_qsvg' />
+                <ComponentRef Id='c_qtga' />
+                <ComponentRef Id='c_qtiff' />
+                <ComponentRef Id='c_qwbmp' />
+                <ComponentRef Id='c_qwebp' />
+                <ComponentRef Id='c_qwindows' />
+                <ComponentRef Id='c_qt_ca' />
+                <ComponentRef Id='c_qt_cs' />
+                <ComponentRef Id='c_qt_de' />
+                <ComponentRef Id='c_qt_en' />
+                <ComponentRef Id='c_qt_fi' />
+                <ComponentRef Id='c_qt_fr' />
+                <ComponentRef Id='c_qt_he' />
+                <ComponentRef Id='c_qt_hu' />
+                <ComponentRef Id='c_qt_it' />
+                <ComponentRef Id='c_qt_ja' />
+                <ComponentRef Id='c_qt_ko' />
+                <ComponentRef Id='c_qt_lv' />
+                <ComponentRef Id='c_qt_pl' />
+                <ComponentRef Id='c_qt_ru' />
+                <ComponentRef Id='c_qt_sk' />
+                <ComponentRef Id='c_qt_uk' />
+                <ComponentRef Id='c_d3dcompiler' />
+                <ComponentRef Id='c_libegl' />
+                <ComponentRef Id='c_libgles' />
+                <ComponentRef Id='c_opengl32sw' />
+                <ComponentRef Id='c_qt5svg' />
 				<ComponentRef Id='c_sherpa' />
 				<ComponentRef Id='c_libassuan' />
 				<ComponentRef Id='c_libgpgerror' />
@@ -190,7 +584,7 @@
 				<ComponentRef Id='c_qt5widgets' />
 				<ComponentRef Id='c_qt5core' />
 				<ComponentRef Id='c_qt5gui' />
-				<ComponentRef Id='c_zlib' /> 
+				<ComponentRef Id='c_zlib' />
 				<ComponentRef Id='ProgramMenuDir' />
 				<ComponentRef Id="ApplicationShortcut" />
 			</Feature>
