@@ -1,0 +1,11 @@
+ui_*.c
+ui_*.h
+*.obj
+*.o
+release/*
+debug/*
+*.msi
+*.rpm
+*.deb
+Sherpa.pro.user
+*~
