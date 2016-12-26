@@ -16,12 +16,26 @@ wixdir = r"C:\Program Files (x86)\WiX Toolset v3.10\bin\\"
 gnupgdir = r"C:\Program Files (x86)\GnuPG\bin\\"
 msvcrtfile = r"C:\Program Files (x86)\Common Files\Merge Modules\\" +\
     "Microsoft_VC140_CRT_x86.msm"
-zlib = r"C:\zlib\zlib1.dll"
+zlibdir = r"C:\zlib\\"
 # End user-serviceable parts
 
+cmd = {
+    "qmake" : qtdir + "qmake.exe",
+    "nmake" : vc14dir + "nmake.exe",
+    "signtool" : w32sdkdir + "signtool.exe",
+    "deployqt" : qtdir + "windeployqt.exe",
+    "candle" : wixdir + "candle.exe",
+    "light" : wixdir + "light.exe"
+}
+zlib = zlibdir + "zlib1.dll"
 delfiles = ["Makefile", "Makefile.Debug", "Makefile.Release",
     "sherpa.wixobj", "sherpa.wixpdb", "sherpa.wxs"]
 deldirs = ["build", "debug", "release"]
+
+for name in cmd:
+    if not os.path.isfile(cmd[name]):
+        print("Couldn't find tool '" + name + "'")
+        sys.exit(0)
 
 [os.unlink(Y) for Y in [X for X in os.listdir() if re.search(r"\.msi$", X)]]
 
@@ -45,17 +59,15 @@ with open("sherpa_template.wxs", encoding="Windows-1252") as fh:
 with open("sherpa.wxs", "w", encoding="Windows-1252") as fh:
     print(re.sub(r"\$VERSION", version, template), file=fh)
 
-qmakecmd = [qtdir + "qmake.exe", "Sherpa.pro"]
-buildcmd = [vc14dir + "nmake.exe"]
-signcmd = [w32sdkdir + "signtool.exe", "sign",
-    "/tr", "http://timestamp.digicert.com", "/td", "sha256", "/fd",
-    "sha256", "/a", r"build\Sherpa.exe"]
-deploycmd = [qtdir + "windeployqt.exe", r"build\sherpa.exe"]
-candlecmd = [wixdir + "candle.exe", "sherpa.wxs"]
-lightcmd = [wixdir + "light.exe", "-ext", "WixUIExtension", "sherpa.wixobj"]
-signmsi = [w32sdkdir + "signtool.exe", "sign",
-    "/tr", "http://timestamp.digicert.com", "/td", "sha256", "/fd",
-    "sha256", "/a", r"Sherpa.msi"]
+qmakecmd = [cmd["qmake"], "Sherpa.pro"]
+buildcmd = [cmd["nmake"]]
+signcmd = [cmd["signtool"], "sign", "/tr", "http://timestamp.digicert.com",
+    "/td", "sha256", "/fd", "sha256", "/a", r"build\Sherpa.exe"]
+deploycmd = [cmd["deployqt"], r"build\sherpa.exe"]
+candlecmd = [cmd["candle"], "sherpa.wxs"]
+lightcmd = [cmd["light"], "-ext", "WixUIExtension", "sherpa.wixobj"]
+signmsi = [cmd["signtool"], "sign", "/tr", "http://timestamp.digicert.com",
+    "/td", "sha256", "/fd", "sha256", "/a", r"Sherpa.msi"]
 
 subprocess.Popen(qmakecmd).wait()
 subprocess.Popen(buildcmd).wait()
