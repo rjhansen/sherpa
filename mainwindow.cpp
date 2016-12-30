@@ -17,6 +17,9 @@
 
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include "aboutdialog.h"
+#include "minizip/unzip.h"
+#include "minizip/zip.h"
 
 #include <QDebug>
 #include <QDir>
@@ -33,15 +36,18 @@
 #include <string>
 #include <vector>
 
-#include "aboutdialog.h"
-#include "minizip/unzip.h"
-#include "minizip/zip.h"
+#ifdef WIN32
+#elif __APPLE__ || __UNIX__
+#include <sys/types.h>
+#include <sys/stat.h>
+#endif
 
 using std::vector;
 using std::list;
 using std::remove_if;
 using std::transform;
 using std::map;
+using std::array;
 
 namespace {
 QString clickFile = QCoreApplication::translate("sherpa", "Click “Choose file” to continue.");
@@ -94,18 +100,8 @@ list<QString> getSubdirsAndFiles(QString basedir)
             rv.push_back(qfi.fileName());
     }
 
-    QString dirname = "crls.d";
-    QDir qd(basedir + QDir::separator() + dirname);
-    if (qd.exists() && qd.isReadable()) {
-        qd.setFilter(QDir::Files);
-        auto files = qd.entryInfoList();
-        for (const auto& qfi : files)
-            if (qfi.isReadable())
-                rv.push_back(dirname + QDir::separator() + qfi.fileName());
-    }
-
-    dirname = "openpgp-revocs.d";
-    qd = QDir(basedir + QDir::separator() + dirname);
+    QString dirname = "openpgp-revocs.d";
+    auto qd = QDir(basedir + QDir::separator() + dirname);
     QRegExp revocs("^[A-Fa-f0-9]{40}\\.rev$");
     if (qd.exists() && qd.isReadable()) {
         qd.setFilter(QDir::Files);
@@ -383,6 +379,13 @@ void MainWindow::restoreFrom()
         return;
     }
 
+    QFileDevice::Permissions publicPerm =
+            QFileDevice::ReadOwner | QFileDevice::WriteOwner |
+            QFileDevice::ReadUser  | QFileDevice::WriteUser  |
+            QFileDevice::ReadGroup | QFileDevice::ReadOther;
+    QFileDevice::Permissions privatePerm =
+            QFileDevice::ReadOwner | QFileDevice::WriteOwner |
+            QFileDevice::ReadUser  | QFileDevice::WriteUser;
     for (auto const& elem : files) {
         if (elem.first.endsWith(".bin"))
             continue;
@@ -390,14 +393,28 @@ void MainWindow::restoreFrom()
         auto contents = elem.second;
         QFileInfo qfi(fn);
         QDir dir = qfi.absoluteDir();
-        if (! dir.exists())
+        if (! dir.exists()) {
+#ifdef WIN32
+#elif __APPLE__ || __UNIX__
+            mode_t newmask = S_IRWXU;
+            if (dir.dirName() == "openpgp-revocs.d")
+                newmask = newmask|S_IRGRP|S_IXGRP|S_IROTH|S_IXOTH;
+            auto oldmask = umask(newmask);
             dir.mkpath(dir.canonicalPath());
+            umask(oldmask);
+#endif
+
+        }
         QFile fh(fn);
         if (fh.exists())
             fh.remove();
         fh.open(QFile::WriteOnly);
         fh.write(contents);
         fh.close();
+        if (QFileInfo(fn).absolutePath().endsWith("private-keys-v1.d"))
+            fh.setPermissions(privatePerm);
+        else
+            fh.setPermissions(publicPerm);
     }
 
     auto fn_qba = ui->lineEdit->text().toUtf8();
