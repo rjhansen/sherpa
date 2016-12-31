@@ -393,18 +393,8 @@ void MainWindow::restoreFrom()
         auto contents = elem.second;
         QFileInfo qfi(fn);
         QDir dir = qfi.absoluteDir();
-        if (! dir.exists()) {
-#ifdef WIN32
-#elif __APPLE__ || __UNIX__
-            mode_t newmask = S_IRWXU;
-            if (dir.dirName() == "openpgp-revocs.d")
-                newmask = newmask|S_IRGRP|S_IXGRP|S_IROTH|S_IXOTH;
-            auto oldmask = umask(newmask);
-            dir.mkpath(dir.canonicalPath());
-            umask(oldmask);
-#endif
-
-        }
+        if (! dir.exists())
+            dir.mkpath(".");
         QFile fh(fn);
         if (fh.exists())
             fh.remove();
@@ -416,6 +406,24 @@ void MainWindow::restoreFrom()
         else
             fh.setPermissions(publicPerm);
     }
+
+#ifdef WIN32
+#elif __APPLE__ || __UNIX__
+    array<char, PATH_MAX> buffer;
+    if (QDir(gnupgDir + "/openpgp-revocs.d").exists()) {
+        std::fill(buffer.begin(), buffer.end(), 0);
+        strncpy(&buffer[0], gpgme_get_dirinfo("homedir"), buffer.size());
+        strcat(&buffer[0], "/openpgp-revocs.d");
+        chmod(&buffer[0], 0755);
+    }
+    if (QDir(gnupgDir + "/private-keys-v1.d").exists()) {
+        std::fill(buffer.begin(), buffer.end(), 0);
+        strncpy(&buffer[0], gpgme_get_dirinfo("homedir"), buffer.size());
+        strcat(&buffer[0], "/private-keys-v1.d");
+        chmod(&buffer[0], 0700);
+    }
+
+#endif
 
     auto fn_qba = ui->lineEdit->text().toUtf8();
     auto zipfile = unzOpen(fn_qba.data());
@@ -509,7 +517,7 @@ void MainWindow::updateUI()
         if (!QDir(gnupgDir).exists()) {
             QMessageBox::warning(this,
                 tr("No profile found"),
-                tr("There is GnuPG profile folder to restore into."),
+                tr("There is no GnuPG profile folder to restore into."),
                 QMessageBox::Ok,
                 QMessageBox::Ok);
             ui->lineEdit->setText("");

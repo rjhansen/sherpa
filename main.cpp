@@ -18,6 +18,7 @@
 #include "mainwindow.h"
 #include <QApplication>
 #include <QMessageBox>
+#include <QDir>
 #include <locale.h>
 
 gpgme_ctx_t ctx;
@@ -36,10 +37,14 @@ void init_gpgme()
     gpgme_set_locale(nullptr, LC_MESSAGES, setlocale(LC_MESSAGES, nullptr));
 #endif
 
-    auto err1 = gpgme_engine_check_version(GPGME_PROTOCOL_OpenPGP);
-    auto err2 = gpgme_get_engine_info(&info);
+#define NOERR(x) (GPG_ERR_NO_ERROR == gpg_err_code(x))
+    bool cond1 = NOERR(gpgme_engine_check_version(GPGME_PROTOCOL_OpenPGP));
+    bool cond2 = NOERR(gpgme_get_engine_info(&info));
+#undef NOERR
+    bool cond3 = ((nullptr != gpgme_get_dirinfo("homedir")
+            && QDir(QString(gpgme_get_dirinfo("homedir"))).exists()));
 
-    if (!(gpg_err_code(err1) == GPG_ERR_NO_ERROR) && (gpg_err_code(err2) == GPG_ERR_NO_ERROR))
+    if (!(cond1 && cond2 && cond3))
         throw GnuPGNotFound();
 
     while (info && info->protocol != GPGME_PROTOCOL_OpenPGP)
@@ -72,7 +77,9 @@ int main(int argc, char* argv[])
     } catch (const GnuPGNotFound&) {
         QMessageBox::critical(nullptr,
             "Could not find GnuPG",
-            "GnuPG doesn't appear to be installed.",
+            "GnuPG doesn't appear to be installed.  Install it and run "
+            "it once from the command line to initialize it, then re-run "
+            "Sherpa.",
             QMessageBox::Abort,
             QMessageBox::Abort);
         return 1;
