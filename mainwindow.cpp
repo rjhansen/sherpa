@@ -422,7 +422,6 @@ void MainWindow::restoreFrom()
         strcat(&buffer[0], "/private-keys-v1.d");
         chmod(&buffer[0], 0700);
     }
-
 #endif
 
     auto fn_qba = ui->lineEdit->text().toUtf8();
