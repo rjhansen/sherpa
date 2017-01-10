@@ -1,50 +1,88 @@
 cmake_minimum_required(VERSION 3.6)
-project(sherpa VERSION 0.4.0)
+project(Sherpa VERSION 0.4.0)
+
+set(COMPANY "Robert Hansen")
+set(COPYRIGHT "Copyright (c) 2017 Robert J. Hansen")
+set(IDENTIFIER "org.sixdemonbag.Sherpa")
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_CXX_STANDARD 14)
+set(SHERPA_SRCS main.cpp mainwindow.cpp aboutdialog.cpp)
+set(SHERPA_RCS sherpa.qrc)
 
-find_package(Qt5Widgets)
+find_package(Qt5Widgets REQUIRED)
 
-if(WIN32)
-  set(GPGDIR "C:/Program Files (x86)/GnuPG")
-  set(CMAKE_FIND_LIBRARY_PREFIXES "")
-  set(CMAKE_FIND_LIBRARY_SUFFIXES ".lib" ".dll")
-  find_path(MINIZIP_INCLUDE_DIR zip.h HINTS "C:/zlib/include" PATH_SUFFIXES minizip)
-  find_path(GNUPG_INCLUDE_DIR gpgme.h HINTS ${GPGDIR}/include)
-  find_library(MINIZIP_LIBRARY minizip HINTS "C:/zlib/lib")
-  find_library(GPGME_LIBRARY libgpgme HINTS ${GPGDIR}/bin)
-  find_library(ASSUAN_LIBRARY libassuan HINTS ${GPGDIR}/bin)
-  find_library(GPGERR_LIBRARY libgpg-error HINTS ${GPGDIR}/bin)
-elseif(UNIX)
-  set(SEARCHLIBS "/usr/lib" "/usr/local/lib" "/Users/rjh/lib" "/home/rjh/lib")
-  find_path(MINIZIP_INCLUDE_DIR zip.h HINTS /usr/include /usr/local/include /Users/rjh/include /home/rjh/include /usr/local/Cellar/minizip/1.1/include PATH_SUFFIXES minizip)
-  find_path(GNUPG_INCLUDE_DIR gpgme.h HINTS /usr/include /usr/local/include /Users/rjh/include /home/rjh/include)
-  find_library(MINIZIP_LIBRARY minizip HINTS ${SEARCHLIBS} /usr/local/Cellar/minizip/1.1/lib)
-  find_library(GPGME_LIBRARY gpgme HINTS ${SEARCHLIBS})
-  find_library(ASSUAN_LIBRARY assuan HINTS ${SEARCHLIBS})
-  find_library(GPGERR_LIBRARY gpg-error HINTS ${SEARCHLIBS})
+set(GPGMELIB_HINTS "C:/Program Files (x86)/GnuPG/lib" /usr/lib /usr/lib64 /usr/local/lib /usr/local/lib64 /Users/rjh/lib)
+set(MZLIB_HINTS "C:/zlib/lib" /usr/lib /usr/lib64 /usr/local/lib /usr/local/lib64 /usr/local/Cellar/minizip/1.1/lib)
+set(GPGME_INCLUDE_HINTS "C:/Program Files (x86)/GnuPG/include" /usr/include /usr/local/include /Users/rjh/include)
+set(MZ_INCLUDE_HINTS "C:/zlib/include")
+
+if (WIN32)
+  set(GPGME_LIB_NAME libgpgme)
+  set(ASSUAN_LIB_NAME libassuan)
+  set(GPGERR_LIB_NAME libgpg-error)
+endif()
+if (UNIX)
+  set(GPGME_LIB_NAME gpgme)
+  set(ASSUAN_LIB_NAME assuan)
+  set(GPGERR_LIB_NAME gpg-error)
 endif()
 
-message(STATUS "Minizip include dir: " ${MINIZIP_INCLUDE_DIR})
-message(STATUS "Minizip library:     " ${MINIZIP_LIBRARY})
-message(STATUS "GPGME include dir:   " ${GNUPG_INCLUDE_DIR})
-message(STATUS "GPGME library:       " ${GPGME_LIBRARY})
-message(STATUS "Assuan library:      " ${ASSUAN_LIBRARY})
-message(STATUS "Gpg-err library:     " ${GPGERR_LIBRARY})
+find_path(MINIZIP_INCLUDE_DIR zip.h HINTS ${MZ_INCLUDE_HINTS} PATH_SUFFIXES minizip)
+find_path(GNUPG_INCLUDE_DIR gpgme.h HINTS ${GPGME_INCLUDE_HINTS}/include)
+find_library(MINIZIP_LIBRARY minizip HINTS ${MZLIB_HINTS})
 
-add_executable(sherpa aboutdialog.cpp main.cpp mainwindow.cpp)
-target_link_libraries(sherpa Qt5::Widgets ${MINIZIP_LIBRARY} ${GPGME_LIBRARY} ${ASSUAN_LIBRARY} ${GPGERR_LIBRARY})
+find_library(GPGME_LIBRARY ${GPGME_LIB_NAME} HINTS ${GPGMELIB_HINTS})
+find_library(ASSUAN_LIBRARY ${ASSUAN_LIB_NAME} HINTS ${GPGMELIB_HINTS})
+find_library(GPGERR_LIBRARY ${GPGERR_LIB_NAME} HINTS ${GPGMELIB_HINTS})
+find_library(MINIZIP_LIBRARY minizip HINTS ${MZLIB_HINTS})
 
+qt5_add_resources(SHERPA_GEN_RCS ${SHERPA_RCS})
 
-set(CPACK_GENERATOR "RPM")
-set(CPACK_RPM_PACKAGE_SUMMARY "A tool to migrate GnuPG user profiles.")
-set(CPACK_RPM_PACKAGE_NAME "sherpa")
-set(CPACK_PACKAGE_NAME "sherpa")
-set(CPACK_RPM_PACKAGE_VERSION ${VERSION})
-set(CPACK_PACKAGE_VERSION ${VERSION})
-set(CPACK_PACKAGE_RELEASE "1")
-set(CPACK_RPM_PACKAGE_LICENSE "ISC")
-set(CPACK_RPM_PACKAGE_REQUIRES "gpgme >= 1.6.0, qt5 >= 5.7.0, minizip >= 1.1")
+if (APPLE)
+  set(MACOSX_BUNDLE_ICON_FILE Sherpa.icns) 
+  set_source_files_properties(${CMAKE_CURRENT_SOURCE_DIR}/Sherpa.icns PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
+  set(SHERPA_SRCS ${SHERPA_SRCS} ${CMAKE_CURRENT_SOURCE_DIR}/Sherpa.icns)
+endif(APPLE)
+
+add_executable(Sherpa MACOSX_BUNDLE WIN32 ${SHERPA_SRCS} ${SHERPA_GEN_RCS})
+target_link_libraries(Sherpa Qt5::Widgets ${GPGME_LIBRARY} ${ASSUAN_LIBRARY} ${GPGERR_LIBRARY} ${MINIZIP_LIBRARY})
+
+set(plugin_dest_dir bin)
+set(qtconf_dest_dir bin)
+set(APPS "\${CMAKE_INSTALL_PREFIX}/bin/Sherpa")
+if (APPLE)
+  set(plugin_dest_dir Sherpa.app/Contents/MacOS)
+  set(qtconf_dest_dir Sherpa.app/Contents/Resources)
+  set(APPS "\${CMAKE_INSTALL_PREFIX}/Sherpa.app")
+elseif (WIN32)
+  set(APPS "\${CMAKE_INSTALL_PREFIX}/bin/Sherpa.exe")
+endif()
+
+install(TARGETS Sherpa BUNDLE DESTINATION . COMPONENT Runtime RUNTIME DESTINATION bin COMPONENT Runtime)
+
+#--------------------------------------------------------------------------------
+# Install needed Qt plugins by copying directories from the qt installation
+# One can cull what gets copied by using 'REGEX "..." EXCLUDE'
+install(DIRECTORY "${QT_PLUGINS_DIR}/imageformats" DESTINATION ${plugin_dest_dir}/plugins COMPONENT Runtime)
+
+install(CODE "
+    file(WRITE \"\${CMAKE_INSTALL_PREFIX}/${qtconf_dest_dir}/qt.conf\" \"\")
+    " COMPONENT Runtime)
+
+set(DIRS ${QT_LIBRARY_DIRS})
+
+install(CODE "
+    file(GLOB_RECURSE QTPLUGINS
+      \"\${CMAKE_INSTALL_PREFIX}/${plugin_dest_dir}/plugins/*${CMAKE_SHARED_LIBRARY_SUFFIX}\")
+    include(BundleUtilities)
+    fixup_bundle(\"${APPS}\" \"\${QTPLUGINS}\" \"${DIRS}\")
+    " COMPONENT Runtime)
+
+# To Create a package, one can run "cpack -G DragNDrop CPackConfig.cmake" on Mac OS X
+# where CPackConfig.cmake is created by including CPack
+# And then there's ways to customize this as well
+set(CPACK_BINARY_DRAGNDROP ON)
 include(CPack)
+
