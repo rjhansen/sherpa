@@ -1,10 +1,8 @@
-QT       += core gui
-
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
-
-CONFIG += c++14
-TARGET = Sherpa
-TEMPLATE = app
+QT       += core gui widgets
+CONFIG   += c++14
+TARGET    = Sherpa
+TEMPLATE  = app
+DEFINES  += FULL_VERSION=\\\"0.3.0\\\" SHORT_VERSION=\\\"0.3\\\"
 
 # Assumes you're using a 32-bit MSVC build of Qt.
 #
@@ -43,18 +41,17 @@ osx {
     LIBS += -lminizip -lgpgme -lassuan -lgpg-error
 }
 
-RESOURCES = sherpa.qrc
+RESOURCES  = sherpa.qrc
 
-SOURCES += main.cpp\
-        mainwindow.cpp \
-    aboutdialog.cpp
+SOURCES   += main.cpp\
+             mainwindow.cpp \
+             aboutdialog.cpp
 
-HEADERS  += mainwindow.h \
-    aboutdialog.h
+HEADERS   += mainwindow.h \
+             aboutdialog.h
 
-FORMS    += mainwindow.ui \
-    aboutdialog.ui
+FORMS     += mainwindow.ui \
+             aboutdialog.ui
 
-DISTFILES += \
-    LICENSE \
-    sherpa.jpg
+DISTFILES += LICENSE \
+             sherpa.jpg
