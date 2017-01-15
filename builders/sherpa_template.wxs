@@ -28,14 +28,14 @@
 			Value="Sherpa $VERSION Installation [1]" />
 		<Property Id="WIXUI_INSTALLDIR" Value="INSTALLDIR" />
 		<UIRef Id="WixUI_Minimal"/>
-		<WixVariable Id="WixUILicenseRtf" Value="build\License.rtf" />
+		<WixVariable Id="WixUILicenseRtf" Value="release\License.rtf" />
 		<Directory
 			Id='TARGETDIR'
 			Name='SourceDir'>
 
             <Merge
                 Id="VCRedist"
-                SourceFile="build\Microsoft_VC140_CRT_x86.msm"
+                SourceFile="release\Microsoft_VC140_CRT_x86.msm"
                 DiskId="1"
                 Language="0"/>
 
@@ -70,7 +70,7 @@
     							Id='qsvgicon'
     							Name='qsvgicon.dll'
     							DiskId='1'
-    							Source='build\iconengines\qsvgicon.dll'
+    							Source='release\iconengines\qsvgicon.dll'
     							KeyPath="yes"/>
                         </Component>
                     </Directory>
@@ -84,7 +84,7 @@
     							Id='qdds'
     							Name='qdds.dll'
     							DiskId='1'
-    							Source='build\imageformats\qdds.dll'
+    							Source='release\imageformats\qdds.dll'
     							KeyPath="yes"/>
                         </Component>
                         <Component
@@ -94,7 +94,7 @@
     							Id='qgif'
     							Name='qgif.dll'
     							DiskId='1'
-    							Source='build\imageformats\qgif.dll'
+    							Source='release\imageformats\qgif.dll'
     							KeyPath="yes"/>
                         </Component>
                         <Component
@@ -104,7 +104,7 @@
     							Id='qicns'
     							Name='qicns.dll'
     							DiskId='1'
-    							Source='build\imageformats\qicns.dll'
+    							Source='release\imageformats\qicns.dll'
     							KeyPath="yes"/>
                         </Component>
                         <Component
@@ -114,7 +114,7 @@
     							Id='qico'
     							Name='qico.dll'
     							DiskId='1'
-    							Source='build\imageformats\qico.dll'
+    							Source='release\imageformats\qico.dll'
     							KeyPath="yes"/>
                         </Component>
                         <Component
@@ -124,7 +124,7 @@
     							Id='qjpeg'
     							Name='qjpeg.dll'
     							DiskId='1'
-    							Source='build\imageformats\qjpeg.dll'
+    							Source='release\imageformats\qjpeg.dll'
     							KeyPath="yes"/>
                         </Component>
                         <Component
@@ -134,7 +134,7 @@
     							Id='qsvg'
     							Name='qsvg.dll'
     							DiskId='1'
-    							Source='build\imageformats\qsvg.dll'
+    							Source='release\imageformats\qsvg.dll'
     							KeyPath="yes"/>
                         </Component>
                         <Component
@@ -144,7 +144,7 @@
     							Id='qtga'
     							Name='qtga.dll'
     							DiskId='1'
-    							Source='build\imageformats\qtga.dll'
+    							Source='release\imageformats\qtga.dll'
     							KeyPath="yes"/>
                         </Component>
                         <Component
@@ -154,7 +154,7 @@
     							Id='qtiff'
     							Name='qtiff.dll'
     							DiskId='1'
-    							Source='build\imageformats\qtiff.dll'
+    							Source='release\imageformats\qtiff.dll'
     							KeyPath="yes"/>
                         </Component>
                         <Component
@@ -164,7 +164,7 @@
     							Id='qwbmp'
     							Name='qwbmp.dll'
     							DiskId='1'
-    							Source='build\imageformats\qwbmp.dll'
+    							Source='release\imageformats\qwbmp.dll'
     							KeyPath="yes"/>
                         </Component>
                         <Component
@@ -174,7 +174,7 @@
     							Id='qwebp'
     							Name='qwebp.dll'
     							DiskId='1'
-    							Source='build\imageformats\qwebp.dll'
+    							Source='release\imageformats\qwebp.dll'
     							KeyPath="yes"/>
                         </Component>
                     </Directory>
@@ -188,7 +188,7 @@
     							Id='qwindows'
     							Name='qwindows.dll'
     							DiskId='1'
-    							Source='build\platforms\qwindows.dll'
+    							Source='release\platforms\qwindows.dll'
     							KeyPath="yes"/>
                         </Component>
                     </Directory>
@@ -202,7 +202,7 @@
     							Id='qt_ca'
     							Name='qt_ca.qm'
     							DiskId='1'
-    							Source='build\translations\qt_ca.qm'
+    							Source='release\translations\qt_ca.qm'
     							KeyPath="yes"/>
                         </Component>
                         <Component
@@ -212,7 +212,7 @@
     							Id='qt_cs'
     							Name='qt_cs.qm'
     							DiskId='1'
-    							Source='build\translations\qt_cs.qm'
+    							Source='release\translations\qt_cs.qm'
     							KeyPath="yes"/>
                         </Component>
                         <Component
@@ -222,7 +222,7 @@
     							Id='qt_de'
     							Name='qt_de.qm'
     							DiskId='1'
-    							Source='build\translations\qt_de.qm'
+    							Source='release\translations\qt_de.qm'
     							KeyPath="yes"/>
                         </Component>
                         <Component
@@ -232,7 +232,7 @@
     							Id='qt_en'
     							Name='qt_en.qm'
     							DiskId='1'
-    							Source='build\translations\qt_en.qm'
+    							Source='release\translations\qt_en.qm'
     							KeyPath="yes"/>
                         </Component>
                         <Component
@@ -242,7 +242,7 @@
     							Id='qt_fi'
     							Name='qt_fi.qm'
     							DiskId='1'
-    							Source='build\translations\qt_fi.qm'
+    							Source='release\translations\qt_fi.qm'
     							KeyPath="yes"/>
                         </Component>
                         <Component
@@ -252,7 +252,7 @@
     							Id='qt_fr'
     							Name='qt_fr.qm'
     							DiskId='1'
-    							Source='build\translations\qt_fr.qm'
+    							Source='release\translations\qt_fr.qm'
     							KeyPath="yes"/>
                         </Component>
                         <Component
@@ -262,7 +262,7 @@
     							Id='qt_he'
     							Name='qt_he.qm'
     							DiskId='1'
-    							Source='build\translations\qt_he.qm'
+    							Source='release\translations\qt_he.qm'
     							KeyPath="yes"/>
                         </Component>
                         <Component
@@ -272,7 +272,7 @@
     							Id='qt_hu'
     							Name='qt_hu.qm'
     							DiskId='1'
-    							Source='build\translations\qt_hu.qm'
+    							Source='release\translations\qt_hu.qm'
     							KeyPath="yes"/>
                         </Component>
                         <Component
@@ -282,7 +282,7 @@
     							Id='qt_it'
     							Name='qt_it.qm'
     							DiskId='1'
-    							Source='build\translations\qt_it.qm'
+    							Source='release\translations\qt_it.qm'
     							KeyPath="yes"/>
                         </Component>
                         <Component
@@ -292,7 +292,7 @@
     							Id='qt_ja'
     							Name='qt_ja.qm'
     							DiskId='1'
-    							Source='build\translations\qt_ja.qm'
+    							Source='release\translations\qt_ja.qm'
     							KeyPath="yes"/>
                         </Component>
                         <Component
@@ -302,7 +302,7 @@
     							Id='qt_ko'
     							Name='qt_ko.qm'
     							DiskId='1'
-    							Source='build\translations\qt_ko.qm'
+    							Source='release\translations\qt_ko.qm'
     							KeyPath="yes"/>
                         </Component>
                         <Component
@@ -312,7 +312,7 @@
     							Id='qt_lv'
     							Name='qt_lv.qm'
     							DiskId='1'
-    							Source='build\translations\qt_lv.qm'
+    							Source='release\translations\qt_lv.qm'
     							KeyPath="yes"/>
                         </Component>
                         <Component
@@ -322,7 +322,7 @@
     							Id='qt_pl'
     							Name='qt_pl.qm'
     							DiskId='1'
-    							Source='build\translations\qt_pl.qm'
+    							Source='release\translations\qt_pl.qm'
     							KeyPath="yes"/>
                         </Component>
                         <Component
@@ -332,7 +332,7 @@
     							Id='qt_ru'
     							Name='qt_ru.qm'
     							DiskId='1'
-    							Source='build\translations\qt_ru.qm'
+    							Source='release\translations\qt_ru.qm'
     							KeyPath="yes"/>
                         </Component>
                         <Component
@@ -342,7 +342,7 @@
     							Id='qt_sk'
     							Name='qt_sk.qm'
     							DiskId='1'
-    							Source='build\translations\qt_sk.qm'
+    							Source='release\translations\qt_sk.qm'
     							KeyPath="yes"/>
                         </Component>
                         <Component
@@ -352,7 +352,7 @@
     							Id='qt_uk'
     							Name='qt_uk.qm'
     							DiskId='1'
-    							Source='build\translations\qt_uk.qm'
+    							Source='release\translations\qt_uk.qm'
     							KeyPath="yes"/>
                         </Component>
                     </Directory>
@@ -363,7 +363,7 @@
 							Id='d3dcompiler'
 							Name='d3dcompiler_47.dll'
 							DiskId='1'
-							Source='build\d3dcompiler_47.dll'
+							Source='release\d3dcompiler_47.dll'
 							KeyPath="yes"/>
 					</Component>
                     <Component
@@ -373,7 +373,7 @@
 							Id='libegl'
 							Name='libEGL.dll'
 							DiskId='1'
-							Source='build\libEGL.dll'
+							Source='release\libEGL.dll'
 							KeyPath="yes"/>
 					</Component>
                     <Component
@@ -383,7 +383,7 @@
 							Id='libgles'
 							Name='libGLESV2.dll'
 							DiskId='1'
-							Source='build\libGLESV2.dll'
+							Source='release\libGLESV2.dll'
 							KeyPath="yes"/>
 					</Component>
                     <Component
@@ -393,7 +393,7 @@
 							Id='opengl32sw'
 							Name='opengl32sw.dll'
 							DiskId='1'
-							Source='build\opengl32sw.dll'
+							Source='release\opengl32sw.dll'
 							KeyPath="yes"/>
 					</Component>
                     <Component
@@ -403,7 +403,7 @@
 							Id='qt5svg'
 							Name='Qt5Svg.dll'
 							DiskId='1'
-							Source='build\Qt5Svg.dll'
+							Source='release\Qt5Svg.dll'
 							KeyPath="yes"/>
 					</Component>
 					<Component
@@ -413,7 +413,7 @@
 							Id='gpgmelauncher'
 							Name='gpgme-w32spawn.exe'
 							DiskId='1'
-							Source='build\gpgme-w32spawn.exe'
+							Source='release\gpgme-w32spawn.exe'
 							KeyPath="yes"/>
 					</Component>
 					<Component
@@ -423,7 +423,7 @@
 							Id='libassuan'
 							Name='libassuan-0.dll'
 							DiskId='1'
-							Source='build\libassuan-0.dll'
+							Source='release\libassuan-0.dll'
 							KeyPath="yes" />
 					</Component>
 					<Component
@@ -433,7 +433,7 @@
 							Id='libgpgerror'
 							Name='libgpg-error-0.dll'
 							DiskId='1'
-							Source='build\libgpg-error-0.dll'
+							Source='release\libgpg-error-0.dll'
 							KeyPath="yes" />
 					</Component>
 					<Component
@@ -443,7 +443,7 @@
 							Id='libgpgme'
 							Name='libgpgme-11.dll'
 							DiskId='1'
-							Source='build\libgpgme-11.dll'
+							Source='release\libgpgme-11.dll'
 							KeyPath="yes"/>
 					</Component>
 					<Component
@@ -453,7 +453,7 @@
 							Id='qt5core'
 							Name='Qt5Core.dll'
 							DiskId='1'
-							Source='build\Qt5Core.dll'
+							Source='release\Qt5Core.dll'
 							KeyPath="yes"/>
 					</Component>
 					<Component
@@ -463,7 +463,7 @@
 							Id='qt5gui'
 							Name='Qt5Gui.dll'
 							DiskId='1'
-							Source='build\Qt5Gui.dll'
+							Source='release\Qt5Gui.dll'
 							KeyPath="yes"/>
 					</Component>
 					<Component
@@ -473,7 +473,7 @@
 							Id='qt5widgets'
 							Name='Qt5Widgets.dll'
 							DiskId='1'
-							Source='build\Qt5Widgets.dll'
+							Source='release\Qt5Widgets.dll'
 							KeyPath="yes"/>
 					</Component>
 					<Component
@@ -483,7 +483,7 @@
 							Id='zlib'
 							Name='zlib1.dll'
 							DiskId='1'
-							Source='build\zlib1.dll'
+							Source='release\zlib1.dll'
 							KeyPath="yes"/>
 					</Component>
 					<Component
@@ -493,7 +493,7 @@
 							Id='sherpa'
 							Name='Sherpa.exe'
 							DiskId='1'
-							Source='build\Sherpa.exe'
+							Source='release\Sherpa.exe'
 							KeyPath="yes"/>
 					</Component>
 				</Directory>

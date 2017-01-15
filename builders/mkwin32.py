@@ -33,6 +33,8 @@ zlibdir = r"C:\zlib\\"
 shouldSign = False
 # End user-serviceable parts
 
+os.chdir("..")
+
 cmd = {
     "qmake" : qtdir + "qmake.exe",
     "nmake" : vc14dir + "nmake.exe",
@@ -61,14 +63,9 @@ for dirname in deldirs:
     if os.path.isdir(dirname):
         shutil.rmtree(dirname)
 
-version_re = re.compile(r"^\d+(\.\d+){1,2}$")
-print("Sherpa version tag: ", end="")
-version = input()
-while not version_re.match(version):
-    print("Bad tag.  New tag: ", end="")
-    version = input()
-
-with open("sherpa_template.wxs", encoding="Windows-1252") as fh:
+with open("sherpa.pro") as fh:
+    version = version_re.search(fh.read()).group(1)
+with open("builders/sherpa_template.wxs", encoding="Windows-1252") as fh:
     template = fh.read()
 with open("sherpa.wxs", "w", encoding="Windows-1252") as fh:
     print(re.sub(r"\$VERSION", version, template), file=fh)
@@ -76,8 +73,8 @@ with open("sherpa.wxs", "w", encoding="Windows-1252") as fh:
 qmakecmd = [cmd["qmake"], "Sherpa.pro"]
 buildcmd = [cmd["nmake"]]
 signcmd = [cmd["signtool"], "sign", "/tr", "http://timestamp.digicert.com",
-    "/td", "sha256", "/fd", "sha256", "/a", r"build\Sherpa.exe"]
-deploycmd = [cmd["deployqt"], r"build\sherpa.exe"]
+    "/td", "sha256", "/fd", "sha256", "/a", r"release\Sherpa.exe"]
+deploycmd = [cmd["deployqt"], r"release\sherpa.exe"]
 candlecmd = [cmd["candle"], "sherpa.wxs"]
 lightcmd = [cmd["light"], "-ext", "WixUIExtension", "sherpa.wixobj"]
 signmsi = [cmd["signtool"], "sign", "/tr", "http://timestamp.digicert.com",
@@ -92,7 +89,6 @@ for filename in ["gpgme-w32spawn.exe", "libassuan-0.dll",
 shutil.copy(zlib, "release")
 shutil.copy(msvcrtfile, "release")
 shutil.copy("License.rtf", "release")
-os.rename("release", "build")
 
 if shouldSign:
     subprocess.Popen(signcmd).wait()
@@ -103,6 +99,7 @@ if shouldSign:
     subprocess.Popen(signmsi).wait()
 
 os.rename("Sherpa.msi", "sherpa-" + version + ".msi")
+shutil.move("sherpa-" + version + ".msi", "builders")
 
 for fn in delfiles:
     if os.path.isfile(fn):
@@ -111,3 +108,5 @@ for fn in delfiles:
 for dirname in deldirs:
     if os.path.isdir(dirname):
         shutil.rmtree(dirname)
+
+os.chdir("builders")
