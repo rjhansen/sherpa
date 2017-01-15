@@ -398,7 +398,7 @@ void MainWindow::restoreFrom()
         fh.open(QFile::WriteOnly);
         fh.write(contents);
         fh.close();
-        fh.setPermissions(publicPerm);
+        fh.setPermissions(privatePerm);
     }
 
 #ifdef WIN32
