@@ -2,7 +2,7 @@ QT       += core gui widgets
 CONFIG   += c++14 release 
 TARGET    = sherpa
 TEMPLATE  = app
-DEFINES  += FULL_VERSION=\\\"0.3.0\\\" SHORT_VERSION=\\\"0.3\\\"
+DEFINES  += FULL_VERSION=\\\"0.3.0\\\"
 
 # Assumes you're using a 32-bit MSVC build of Qt.
 #

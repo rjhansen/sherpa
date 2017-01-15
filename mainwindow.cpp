@@ -215,7 +215,7 @@ MainWindow::MainWindow(QWidget* parent)
     , ui{ new Ui::MainWindow }
     , gnupgDir{ gpgme_get_dirinfo("homedir") }
 {
-  setWindowTitle("Sherpa " SHORT_VERSION);
+  setWindowTitle("Sherpa " FULL_VERSION);
     gpgme_engine_info_t info;
 
     if (gpg_err_code(gpgme_get_engine_info(&info)) == GPG_ERR_NO_ERROR) {
