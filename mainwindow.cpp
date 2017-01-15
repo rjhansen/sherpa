@@ -215,7 +215,6 @@ MainWindow::MainWindow(QWidget* parent)
     , ui{ new Ui::MainWindow }
     , gnupgDir{ gpgme_get_dirinfo("homedir") }
 {
-  setWindowTitle("Sherpa " FULL_VERSION);
     gpgme_engine_info_t info;
 
     if (gpg_err_code(gpgme_get_engine_info(&info)) == GPG_ERR_NO_ERROR) {
@@ -231,6 +230,7 @@ MainWindow::MainWindow(QWidget* parent)
     }
 
     ui->setupUi(this);
+    setWindowTitle("Sherpa " FULL_VERSION);
     ui->comboBox->setCurrentIndex(QDir(gnupgDir).exists() ? 0 : 1);
     filenames.at(0) = "";
     filenames.at(1) = "";
