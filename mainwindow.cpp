@@ -380,10 +380,6 @@ void MainWindow::restoreFrom()
         return;
     }
 
-    QFileDevice::Permissions publicPerm =
-            QFileDevice::ReadOwner | QFileDevice::WriteOwner |
-            QFileDevice::ReadUser  | QFileDevice::WriteUser  |
-            QFileDevice::ReadGroup | QFileDevice::ReadOther;
     QFileDevice::Permissions privatePerm =
             QFileDevice::ReadOwner | QFileDevice::WriteOwner |
             QFileDevice::ReadUser  | QFileDevice::WriteUser;
@@ -402,10 +398,7 @@ void MainWindow::restoreFrom()
         fh.open(QFile::WriteOnly);
         fh.write(contents);
         fh.close();
-        if (QFileInfo(fn).absolutePath().endsWith("private-keys-v1.d"))
-            fh.setPermissions(privatePerm);
-        else
-            fh.setPermissions(publicPerm);
+        fh.setPermissions(publicPerm);
     }
 
 #ifdef WIN32
@@ -415,7 +408,7 @@ void MainWindow::restoreFrom()
         std::fill(buffer.begin(), buffer.end(), 0);
         strncpy(&buffer[0], gpgme_get_dirinfo("homedir"), buffer.size());
         strcat(&buffer[0], "/openpgp-revocs.d");
-        chmod(&buffer[0], 0755);
+        chmod(&buffer[0], 0700);
     }
     if (QDir(gnupgDir + "/private-keys-v1.d").exists()) {
         std::fill(buffer.begin(), buffer.end(), 0);
