@@ -22,15 +22,15 @@ import sys
 
 
 # User-serviceable parts here
-qtdir = r"D:\Qt\Qt5.7.1\5.7\msvc2015\bin\\"
-vc14dir = r"D:\Microsoft Visual Studio 14.0\VC\bin\\"
+qtdir = r"C:\Qt\Qt5.7.1\5.7\msvc2015\bin\\"
+vc14dir = r"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\\"
 w32sdkdir = r"C:\Program Files (x86)\Windows Kits\10\bin\x86\\"
 wixdir = r"C:\Program Files (x86)\WiX Toolset v3.10\bin\\"
 gnupgdir = r"C:\Program Files (x86)\GnuPG\bin\\"
 msvcrtfile = r"C:\Program Files (x86)\Common Files\Merge Modules\\" +\
     "Microsoft_VC140_CRT_x86.msm"
 zlibdir = r"C:\zlib\\"
-shouldSign = False
+shouldSign = True
 # End user-serviceable parts
 
 os.chdir("..")
@@ -53,7 +53,8 @@ for name in cmd:
         print("Couldn't find tool '" + name + "'")
         sys.exit(0)
 
-[os.unlink(Y) for Y in [X for X in os.listdir() if re.search(r"\.msi$", X)]]
+[os.unlink("builders/" + Y) for Y in
+    [X for X in os.listdir("builders") if re.search(r"\.msi$", X)]]
 
 for fn in delfiles:
     if os.path.isfile(fn):
@@ -63,8 +64,9 @@ for dirname in deldirs:
     if os.path.isdir(dirname):
         shutil.rmtree(dirname)
 
+version_re = re.compile(r"\d\.\d\.\d")
 with open("sherpa.pro") as fh:
-    version = version_re.search(fh.read()).group(1)
+    version = version_re.search(fh.read()).group(0)
 with open("builders/sherpa_template.wxs", encoding="Windows-1252") as fh:
     template = fh.read()
 with open("sherpa.wxs", "w", encoding="Windows-1252") as fh:
