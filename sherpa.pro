@@ -1,6 +1,6 @@
 QT       += core gui widgets
-CONFIG   += c++14
-TARGET    = Sherpa
+CONFIG   += c++14 release 
+TARGET    = sherpa
 TEMPLATE  = app
 DEFINES  += FULL_VERSION=\\\"0.3.0\\\" SHORT_VERSION=\\\"0.3\\\"
 
@@ -14,16 +14,9 @@ DEFINES  += FULL_VERSION=\\\"0.3.0\\\" SHORT_VERSION=\\\"0.3\\\"
 
 win32 {
     CONFIG += windows
-    INCLUDEPATH += "C:\Program Files (x86)\GnuPG\include"
-    INCLUDEPATH += "C:\zlib\include"
-    LIBS += -L"C:\Program Files (x86)\GnuPG\lib"
-    LIBS += -L"C:\zlib\lib"
+    INCLUDEPATH += "C:\Program Files (x86)\GnuPG\include" "C:\zlib\include"
+    LIBS += -L"C:\Program Files (x86)\GnuPG\lib" -L"C:\zlib\lib"
     LIBS += -llibgpgme -llibgpg-error -llibassuan -lminizip -lzdll -laes -ladvapi32
-    libgpgme.path = "C:\Program Files (x86)\GnuPG\lib\libgpgme-11.dll"
-    libassuan.path = "C:\Program Files (x86)\GnuPG\lib\libassuan-0.dll"
-    libgpgerror.path = "C:\Program Files (x86)\GnuPG\lib\libgpg-error-0.dll"
-    zlib.path = "C:\zlib\zlib1.dll"
-    INSTALLS += libgpgme libassuan libgpgerror zlib
 }
 
 unix {
@@ -34,10 +27,8 @@ unix {
 # homebuilt gpgme.  Use macdeployqt to automagically
 # package all the necessary libs into the Sherpa bundle.
 osx {
-    INCLUDEPATH += /usr/local/Cellar/minizip/1.1/include
-    INCLUDEPATH += /Users/rjh/include
-    LIBS += -L/usr/local/Cellar/minizip/1.1/lib
-    LIBS += -L/Users/rjh/lib
+    INCLUDEPATH += /usr/local/Cellar/minizip/1.1/include /Users/rjh/include
+    LIBS += -L/usr/local/Cellar/minizip/1.1/lib -L/Users/rjh/lib
     LIBS += -lminizip -lgpgme -lassuan -lgpg-error
 }
 
