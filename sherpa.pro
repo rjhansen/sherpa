@@ -20,16 +20,20 @@ win32 {
 }
 
 unix {
-    LIBS += -lminizip -lgpgme -lassuan -lgpg-error
+    INCLUDEPATH += `gpgme-config --cflags`
+    LIBS += `gpgme-config --libs` -lminizip
 }
 
 # Using Homebrew to provide minizip, as well as my own
 # homebuilt gpgme.  Use macdeployqt to automagically
 # package all the necessary libs into the Sherpa bundle.
 osx {
-    INCLUDEPATH += /usr/local/Cellar/minizip/1.1/include /Users/rjh/include
-    LIBS += -L/usr/local/Cellar/minizip/1.1/lib -L/Users/rjh/lib
-    LIBS += -lminizip -lgpgme -lassuan -lgpg-error
+    INCLUDEPATH += /usr/local/Cellar/minizip/1.1/include
+    INCLUDEPATH += `gpgme-config --cflags`
+
+    LIBS += -L/usr/local/Cellar/minizip/1.1/lib
+    LIBS += `gpgme-config --libs`
+    LIBS += -lminizip
 }
 
 RESOURCES  = src/sherpa.qrc
