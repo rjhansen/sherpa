@@ -19,20 +19,17 @@ win32 {
     LIBS += -llibgpgme -llibgpg-error -llibassuan -lminizip -lzdll -laes -ladvapi32
 }
 
-unix {
-    INCLUDEPATH += `gpgme-config --cflags`
-    LIBS += `gpgme-config --libs` -lminizip
-}
-
 # Using Homebrew to provide minizip, as well as my own
 # homebuilt gpgme.  Use macdeployqt to automagically
 # package all the necessary libs into the Sherpa bundle.
 osx {
     INCLUDEPATH += /usr/local/Cellar/minizip/1.1/include
-    INCLUDEPATH += `gpgme-config --cflags`
-
     LIBS += -L/usr/local/Cellar/minizip/1.1/lib
-    LIBS += `gpgme-config --libs`
+}
+
+unix | osx {
+    QMAKE_CXXFLAGS += '$$system(gpgme-config --cflags)'
+    QMAKE_LFLAGS += $$system(gpgme-config --libs)
     LIBS += -lminizip
 }
 
