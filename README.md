@@ -127,6 +127,9 @@ $ make
 
 ... and you should have a bouncing baby app at the end.
 
+(Note: Fedora calls Qt 5's ``qmake`` ``qmake-qt5``.  I don't know what
+other distros call their versions of Qt 5's ``qmake``.)
+
 ## Mac OS X
 
 Good luck, man.  Still working on this one myself.  I can *almost* get an
