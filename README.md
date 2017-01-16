@@ -53,7 +53,9 @@ Bang!  You're done.
 Sherpa is free software distributed under terms of the ISC License.
 
 # How do I build it from source?
+
 ## Windows
+
 ### Prerequisites
 You will need:
 
@@ -70,7 +72,7 @@ You will need:
 
 ### Prep
 Open an Administrator command prompt.  ``cd`` into your GnuPG lib directory
-(usually ``C:\Program Files (x86)\GnuPG\lib).  In here you'll see three
+(usually ``C:\Program Files (x86)\GnuPG\lib``).  In here you'll see three
 files, ``libassuan.imp``, ``libgpg-error.imp``, and ``libgpgme.imp``.
 
 GNU likes to call things ".imp" files, but MSVC expects them to be named ".lib"
@@ -98,6 +100,7 @@ Run ``mkwin32.py``.  You'll have a bouncing baby .MSI installer at the end of
 it.
 
 ## UNIX
+
 ### Prerequisites
 You will need:
 
