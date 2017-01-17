@@ -18,7 +18,7 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include "gpgme.h"
+#include <gpgme.h>
 #include <QMainWindow>
 #include <array>
 #include <cstdint>

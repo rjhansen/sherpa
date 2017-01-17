@@ -20,6 +20,8 @@
 #include <QMessageBox>
 #include <QDir>
 #include <locale.h>
+#include <array>
+#include <set>
 
 gpgme_ctx_t ctx;
 
@@ -29,6 +31,33 @@ void init_gpgme()
 {
     gpgme_engine_info_t info;
     gpgme_error_t err;
+
+#ifdef WIN32
+
+#elif __APPLE__ || __UNIX__
+    std::set<QString> pathset;
+    QStringList newpath;
+    auto path = QString::fromUtf8(qgetenv("PATH"));
+    std::array<QString, 5> addpaths {{
+        QDir::homePath() + QDir::separator() + "bin",
+        "/usr/local/gnupg-2.1/bin",
+        "/usr/local/bin",
+        "/opt/local/bin",
+        "/opt/bin"
+    }};
+
+    for (auto entry: path.split(":"))
+        if (pathset.find(entry) == pathset.end()) {
+            pathset.insert(entry);
+            newpath << entry;
+        }
+    for (auto entry: addpaths)
+        if (pathset.find(entry) == pathset.end() && QDir(entry).exists()) {
+            pathset.insert(entry);
+            newpath << entry;
+        }
+    qputenv("PATH", newpath.join(":").toUtf8());
+#endif
 
     setlocale(LC_ALL, "");
     gpgme_check_version(nullptr);
