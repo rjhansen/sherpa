@@ -2,7 +2,8 @@ QT       += core gui widgets
 CONFIG   += c++14 release
 TARGET    = sherpa
 TEMPLATE  = app
-DEFINES  += FULL_VERSION=\\\"0.3.0\\\"
+VERSION   = 0.4.0
+DEFINES  += FULL_VERSION=\\\"$${VERSION}\\\"
 
 # Assumes you're using a 32-bit MSVC build of Qt.
 #
@@ -22,11 +23,27 @@ win32 {
 # Using Homebrew to provide minizip, as well as my own
 # homebuilt gpgme.  Use macdeployqt to automagically
 # package all the necessary libs into the Sherpa bundle.
+#
+# Note: unless you're me, don't use "make bundle".  Or at
+# the very least, use your own signing certificate.
+
 osx {
     INCLUDEPATH += /usr/local/Cellar/minizip/1.1/include
     LIBS += -L/usr/local/Cellar/minizip/1.1/lib
+
+    bundle.commands += rm -f \"Sherpa *.dmg\" &&\
+make clean &&\
+make &&\
+macdeployqt sherpa.app -always-overwrite && \
+codesign -s \"Robert Hansen\" -i com.roberthansen.sherpa -f --deep sherpa.app && \
+hdiutil create -fs HFS+ -volname \"Sherpa $${VERSION}\" -srcfolder sherpa.app \"Sherpa $${VERSION}.dmg\"
+
+    QMAKE_EXTRA_TARGETS += bundle
 }
 
+# Note: if using this from Qt Creator, make sure to start
+# Qt Creator from the command line so it can inherit your
+# PATH and find gpgme-config.
 unix | osx {
     QMAKE_CXXFLAGS += '$$system(gpgme-config --cflags)'
     QMAKE_LFLAGS += $$system(gpgme-config --libs)
