@@ -45,7 +45,8 @@ cmd = {
 }
 zlib = zlibdir + "zlib1.dll"
 delfiles = ["Makefile", "Makefile.Debug", "Makefile.Release",
-    "sherpa.wixobj", "sherpa.wixpdb", "sherpa.wxs"]
+    "sherpa.wixobj", "sherpa.wixpdb", "sherpa.wxs",
+    "ui_aboutdialog.h", "ui_mainwindow.h"]
 deldirs = ["build", "debug", "release"]
 
 for name in cmd:

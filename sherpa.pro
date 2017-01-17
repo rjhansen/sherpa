@@ -12,12 +12,19 @@ DEFINES  += FULL_VERSION=\\\"$${VERSION}\\\"
 #
 # A distribution of zlib binaries with minizip included can
 # be downloaded from http://sixdemonbag.org/zlib-1.2.8.zip.
+#
+# Note: unless you're me, don't use "nmake msi".  If you want
+# to do this, you'll need to install Python 3.5 and edit the
+# user-serviceable parts of mkwin32.py
 
 win32 {
     CONFIG += windows
     INCLUDEPATH += "C:\Program Files (x86)\GnuPG\include" "C:\zlib\include"
     LIBS += -L"C:\Program Files (x86)\GnuPG\lib" -L"C:\zlib\lib"
     LIBS += -llibgpgme -llibgpg-error -llibassuan -lminizip -lzdll -laes -ladvapi32
+
+    msi.commands += cd builders && mkwin32.py && cd ..
+    QMAKE_EXTRA_TARGETS += msi
 }
 
 # Using Homebrew to provide minizip, as well as my own
@@ -48,6 +55,21 @@ unix | osx {
     QMAKE_CXXFLAGS += '$$system(gpgme-config --cflags)'
     QMAKE_LFLAGS += $$system(gpgme-config --libs)
     LIBS += -lminizip
+}
+
+# To build Fedora 25 RPMs.
+unix:!osx {
+    f25rpm.commands += mkdir -p ~/rpmbuild/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS} &&\
+./clean &&\
+mkdir sherpa-$${VERSION} && cp src sherpa-$${VERSION} &&\
+cp builders sherpa-$${VERSION} && \
+cp clean LICENSE README.md sherpa.pro sherpa-$${VERSION} &&\
+tar czf ~/rpmbuild/SOURCES/sherpa-$${VERSION}.tar.gz sherpa-$${VERSION} &&\
+cd builders && mkf25spec.py &&\
+fedpkg --release f25 mockbuild &&\
+for x in ~/rpmbuild/RPMS/* ; do rpm --resign $x ; done &&\
+for x in ~/rpmbuild/SRPMS/* ; do rpm --resign $x ; done && cd ..
+    QMAKE_EXTRA_TARGETS += f25rpm
 }
 
 RESOURCES  = src/sherpa.qrc
