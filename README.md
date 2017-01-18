@@ -82,13 +82,14 @@ You will need:
   3.  GnuPG
   4.  gpgme 1.6 or later
   5.  Recent zlib and minizip, with development headers
+  6.  Python 3
 
 For instance, on Fedora 25 this can be done with
 
 ```shell
 $ sudo dnf install gcc-c++ qt5 qt5-devel gpgme gpgme-devel\
 libassuan libassuan-devel libgpg-error libgpg-error-devel\
-minizip minizip-devel gnupg2
+minizip minizip-devel gnupg2 python3
 ```
 
 Uncompress the Sherpa source code someplace convenient.  Open a terminal and ``cd`` into that directory.  At that point it's
