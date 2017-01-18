@@ -55,26 +55,32 @@ unix | osx {
     QMAKE_CXXFLAGS += '$$system(gpgme-config --cflags)'
     QMAKE_LFLAGS += $$system(gpgme-config --libs)
     LIBS += -lminizip
+
+    tarball.commands += ./clean &&\
+rm -rf sherpa-$${VERSION} &&\
+rm -f sherpa-$${VERSION}.tar.gz &&\
+mkdir sherpa-$${VERSION} &&\
+cp -r src sherpa-$${VERSION} &&\
+cp -r builders sherpa-$${VERSION} &&\
+cp clean LICENSE README.md sherpa.pro sherpa-$${VERSION} &&\
+tar czf sherpa-$${VERSION}.tar.gz sherpa-$${VERSION} &&\
+rm -rf sherpa-$${VERSION}
+    QMAKE_EXTRA_TARGETS += tarball
 }
 
 # To build Fedora 25 RPMs.
 unix:!osx {
-    tarball.commands += ./clean &&\
-mkdir sherpa-$${VERSION} &&\
-cp src sherpa-$${VERSION} &&\
-cp builders sherpa-$${VERSION} &&\
-cp clean LICENSE README.md sherpa.pro sherpa-$${VERSION} &&\
-tar czf sherpa-$${VERSION}.tar.gz sherpa-$${VERSION}
-
     f25rpm.depends += tarball
-    f25rpm.commands +=  mkdir -p ~/rpmbuild/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS} &&\
-mv sherpa-$${VERSION}.tar.gz ~/rpmbuild/SOURCES &&\
+    f25rpm.commands += mkdir -p ~/rpmbuild/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS} &&\
+mv sherpa-$${VERSION}.tar.gz builders &&\
 cd builders &&\
-mkf25spec.py &&\
+./mkf25spec.py &&\
 fedpkg --release f25 mockbuild &&\
-for x in ~/rpmbuild/RPMS/* ; do rpm --resign $x ; done &&\
-for x in ~/rpmbuild/SRPMS/* ; do rpm --resign $x ; done &&\
-cd ..
+rm -f sherpa.spec &&\
+rpm --resign *.rpm &&\
+cd .. &&\
+mv builders/results_sherpa/$${VERSION}/1/*.rpm . &&\
+rm -rf sherpa-$${VERSION}-1.src.rpm builders/sherpa.spec builders/*gz builders/*rpm builders/results_sherpa
     QMAKE_EXTRA_TARGETS += f25rpm
 }
 

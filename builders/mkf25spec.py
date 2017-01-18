@@ -1,6 +1,16 @@
-Summary:            Migrates GnuPG profiles between machines
+#!/usr/bin/python3
+# coding: UTF-8
+
+import re
+
+ver_rx = re.compile(r"^VERSION\s*=\s*(\d.\d.\d)\s*$")
+
+with open("../sherpa.pro") as fh:
+    version = [Y for Y in [ver_rx.match(X) for X in fh.readlines()] if Y][0].group(1)
+
+spec = re.sub("VERSION_STRING", version, """Summary:            Migrates GnuPG profiles between machines
 Name:               sherpa
-Version:            0.3.0
+Version:            VERSION_STRING
 Release:            1
 License:            ISC
 Source:             %{name}-%{version}.tar.gz
@@ -26,3 +36,7 @@ install -p -m 755 sherpa %{buildroot}/%{_bindir}
 
 %files
 %{_bindir}/sherpa
+""")
+
+with open("sherpa.spec", "w", encoding="UTF-8") as fh:
+    print(spec, file=fh)

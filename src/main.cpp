@@ -53,7 +53,7 @@ void init_gpgme()
             installDir,
             installDir + QDir::separator() + "bin"
     }};
-#elif __APPLE__ || __UNIX__
+#elif __APPLE__ || __UNIX__ || __unix__
     std::array<QString, 5> addpaths {{
         QDir::homePath() + QDir::separator() + "bin",
         "/usr/local/gnupg-2.1/bin",
