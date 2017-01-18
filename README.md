@@ -9,11 +9,13 @@ The GnuPG developers have done a pretty good job of making the 2.0 to 2.1 migrat
 Sherpa can help you in two ways.  First, it can back up the files you need -- and not the ones you don't! -- to a plain-vanilla ZIP archive.  Second, given a Sherpa archive it can automagically restore that data to a new GnuPG installation. This includes doing things like re-importing your certificates if you're going from 1.4/2.0 to 2.1, and vice-versa.
 
 # How do I get it?
-Windows users (both 32- and 64-bit) can download an [MSI installer](https://github.com/rjhansen/sherpa/releases/download/0.3.0/sherpa-0.3.0.msi).  It's a little crude, but it works.
+Windows users (both 32- and 64-bit) can download an [MSI installer](https://github.com/rjhansen/sherpa/releases/download/0.4.0/sherpa-0.4.0.msi).  It's a little crude, but it works.
 
-Fedora 25 users on x86_64 can [download an RPM](http://sixdemonbag.org/sherpa-0.3.0-1.x86_64.rpm), or even [an SRPM](http://sixdemonbag.org/sherpa-0.3.0-1.src.rpm).  The RPMs are signed with my personal GnuPG certificate, 0x1DCBDC01B44427C7, which can be found on the keyserver network.
+Fedora 25 users on x86_64 can [download an RPM](https://github.com/rjhansen/sherpa/releases/download/0.4.0/sherpa-0.4.0-1.x86_64.rpm).  The RPM is signed with my personal GnuPG certificate, 0x1DCBDC01B44427C7, which can be found on the keyserver network.
 
-Other users will need to compile from source.  For that, please see the end of this page.
+macOS 10.12 and later users can download a [disk image](https://github.com/rjhansen/sherpa/releases/download/0.4.0/Sherpa.0.4.0.dmg).
+
+Other users will need to compile from [source](https://github.com/rjhansen/sherpa/archive/0.4.0.tar.gz).  Please see the compilation instructions at the end of this README.
 
 # How do I use it?
 
@@ -25,8 +27,8 @@ Once you've selected your file, click "Go" and wait a few seconds.  Depending on
 
 Bang!  You're done.
 
-# How is it licensed?
-Sherpa is free software distributed under terms of the ISC License.
+# Is it free and/or open-source?
+Yes.  Please see the LICENSE file for details.
 
 # How do I build it from source?
 
@@ -35,12 +37,13 @@ Sherpa is free software distributed under terms of the ISC License.
 ### Prerequisites
 You will need:
 
-  1. Microsoft Visual C++ (the Community Edition works well).  It should also work fine with mingw's GCC, but I haven't tried it.
-  2. Qt 5.7 compiled with the same compiler you'll be using.  (If you're using MSVC, use the MSVC Qt, etc.)
-  3. GnuPG.  Any recent version should work, whether 1.4, 2.0, or 2.1.
-  4. zlib and minizip, again compiled with the correct compiler.  If you're having trouble finding an MSVC-compiled zlib, [I'm hosting a copy](http://sixdemonbag.org/zlib-1.2.8.zip).
-  5. WiX
-  6. Python 3
+  1. [Microsoft Visual Studio 2015](https://go.microsoft.com/fwlink/?LinkId=691978&clcid=0x409).
+  2. The [Microsoft Windows 10 SDK](https://go.microsoft.com/fwlink/?linkid=838916).
+  2. [Qt 5.7 for MSVC](http://download.qt.io/official_releases/qt/5.7/5.7.1/qt-opensource-windows-x86-msvc2015-5.7.1.exe).
+  3. [GnuPG](https://gnupg.org/ftp/gcrypt/binary/gnupg-w32-2.1.17_20161220.exe).
+  4. [zlib and minizip](http://sixdemonbag.org/zlib-1.2.8.zip).
+  5. [WiX](https://wix.codeplex.com/downloads/get/1587179).
+  6. [Python 3](https://www.python.org/ftp/python/3.6.0/python-3.6.0-amd64.exe).
 
 ### Prep
 Open an Administrator command prompt.  ``cd`` into your GnuPG lib directory (usually ``C:\Program Files (x86)\GnuPG\lib``).  In here you'll see three files, ``libassuan.imp``, ``libgpg-error.imp``, and ``libgpgme.imp``.
@@ -57,8 +60,17 @@ Relax, you're not going to affect your GnuPG experience at all -- these files ar
 
 Now that you have that taken care of, uncompress the Sherpa source code somewhere convenient.  Open the file ``builders\mkwin32.py`` in your Python editor-of-choice and look at the top of the file.  There'll be a comment reading, "User-serviceable parts here".  Edit these paths so they point to correct directories for your own system.  Also, unless you have a code signing certificate, set ``shouldSign`` to ``False``.
 
+Next, edit the ``sherpa.pro`` file.  Adjust the file paths in the Windows target appropriately to reflect your local installation dirs.
+
 ### Build
-Run ``mkwin32.py``.  You'll have a bouncing baby .MSI installer at the end of it.
+From the top of the sherpa directory:
+
+```shell
+> \Qt5.7.1\5.7\msvc\bin\qmake
+> nmake msi
+```
+
+… and you'll have an MSI installer you've made yourself.
 
 ## UNIX
 
@@ -67,15 +79,16 @@ You will need:
 
   1.  A good C++ compiler (GCC 5.0 or later, or any recent Clang++).
   2.  Qt 5.7 and development headers
-  3.  gpgme 1.6 or later
-  4.  Recent zlib and minizip, with development headers
+  3.  GnuPG
+  4.  gpgme 1.6 or later
+  5.  Recent zlib and minizip, with development headers
 
 For instance, on Fedora 25 this can be done with
 
 ```shell
 $ sudo dnf install gcc-c++ qt5 qt5-devel gpgme gpgme-devel\
 libassuan libassuan-devel libgpg-error libgpg-error-devel\
-minizip minizip-devel
+minizip minizip-devel gnupg2
 ```
 
 Uncompress the Sherpa source code someplace convenient.  Open a terminal and ``cd`` into that directory.  At that point it's
@@ -85,10 +98,29 @@ $ qmake-qt5 sherpa.pro
 $ make
 ```
 
-… and you should have a bouncing baby app at the end.
+… and you should have a bouncing baby app at the end.  Fedora users can also try ``make f25rpm``, which will make a Fedora 25 RPM.
 
 (Note: Fedora calls Qt 5's ``qmake`` ``qmake-qt5``.  I don't know what other distros call their versions of Qt 5's ``qmake``.)
 
 ## Mac OS X
 
-Good luck, man.  Still working on this one myself.  I can *almost* get an app bundle to work, but something's still going haywire.
+### Prerequisites
+You will need:
+
+  1. XCode and command-line development tools.
+  2. [GnuPG](https://downloads.sourceforge.net/project/gpgosx/GnuPG-2.1.17-003.dmg?r=https%3A%2F%2Fsourceforge.net%2Fprojects%2Fgpgosx%2Ffiles%2F%3Fsource%3Dnavbar&ts=1484706380&use_mirror=superb-sea2).
+  3. [Qt 5.7](http://download.qt.io/official_releases/qt/5.7/5.7.1/qt-opensource-mac-x64-clang-5.7.1.dmg).
+  4. gpgme 1.6 or later
+  5. Recent zlib and minizip
+
+gpgme and minizip can be found in [Homebrew](http://brew.sh/).
+
+Uncompress the Sherpa source code someplace convenient.  Open a terminal and ``cd`` into that directory.  Open the ``sherpa.pro`` file and adjust paths appropriately inside the macOS targets.
+
+```shell
+$ /path/to/qmake sherpa.pro
+$ make
+$ /path/to/macdeployqt sherpa.app
+```
+
+You now have a macOS application you can launch in Finder.
