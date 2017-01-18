@@ -22,7 +22,7 @@
   <property name="modal">
    <bool>true</bool>
   </property>
-  <widget class="QWidget" name="">
+  <widget class="QWidget" name="layoutWidget">
    <property name="geometry">
     <rect>
      <x>10</x>
@@ -67,7 +67,7 @@
            </size>
           </property>
           <property name="text">
-           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:12pt; font-weight:600; text-decoration: underline;&quot;&gt;Sherpa&lt;/span&gt;&lt;/p&gt;&lt;p&gt;The sherpas (from &lt;span style=&quot; font-style:italic;&quot;&gt;sher&lt;/span&gt;&lt;span style=&quot; font-style:italic; color:#000000;&quot;&gt;,&lt;/span&gt;&lt;span style=&quot; color:#000000;&quot;&gt; “east”, and &lt;/span&gt;&lt;span style=&quot; font-style:italic; color:#000000;&quot;&gt;pa,&lt;/span&gt;&lt;span style=&quot; color:#000000;&quot;&gt; “&lt;/span&gt;people&lt;span style=&quot; color:#008000;&quot;&gt;”&lt;/span&gt;) are one of the major ethnic groups of the Himalayas, mostly found in Nepal but also neighboring regions. For centuries they've earned their reputation as being the finest mountaineers in the world, and their services as Himalayan guides are always in high demand.&lt;/p&gt;&lt;p&gt;Migrating GnuPG profiles between different machines may not be as hard as Annapurna or Everest, but there are still a number of different ways to get caught. I hope that like its namesake, Sherpa will help you make the journey safely.&lt;/p&gt;&lt;p align=&quot;right&quot;&gt;-- Rob Hansen, &lt;a href=&quot;mailto:rjh@sixdemonbag.org&amp;amp;subject=Sherpa&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;rjh@sixdemonbag.org&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:12pt; font-weight:600; text-decoration: underline;&quot;&gt;Sherpa&lt;/span&gt;&lt;/p&gt;&lt;p&gt;The sherpas (from &lt;span style=&quot; font-style:italic;&quot;&gt;sher&lt;/span&gt;&lt;span style=&quot; font-style:italic; color:#000000;&quot;&gt;,&lt;/span&gt;&lt;span style=&quot; color:#000000;&quot;&gt; “east”, and &lt;/span&gt;&lt;span style=&quot; font-style:italic; color:#000000;&quot;&gt;pa,&lt;/span&gt;&lt;span style=&quot; color:#000000;&quot;&gt; “&lt;/span&gt;people&lt;span style=&quot; color:#008000;&quot;&gt;”&lt;/span&gt;) are one of the major ethnic groups of the Himalayas, mostly found in Nepal but also neighboring regions. For centuries they've earned their reputation as being the finest mountaineers in the world, and their services as Himalayan guides are always in high demand.&lt;/p&gt;&lt;p&gt;Migrating GnuPG profiles between different machines may not be as hard as Annapurna or Everest, but there are still a number of different ways to get caught. I hope that like its namesake, Sherpa will help you make the journey safely.&lt;/p&gt;&lt;p align=&quot;right&quot;&gt;— Rob Hansen, &lt;a href=&quot;mailto:rjh@sixdemonbag.org&amp;amp;subject=Sherpa&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;rjh@sixdemonbag.org&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
           </property>
           <property name="textFormat">
            <enum>Qt::RichText</enum>

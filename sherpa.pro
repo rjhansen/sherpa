@@ -59,7 +59,6 @@ unix | osx {
 
 # To build Fedora 25 RPMs.
 unix:!osx {
-
     tarball.commands += ./clean &&\
 mkdir sherpa-$${VERSION} &&\
 cp src sherpa-$${VERSION} &&\

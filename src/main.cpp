@@ -23,6 +23,10 @@
 #include <array>
 #include <set>
 
+#ifdef WIN32
+#include <QSettings>
+#endif
+
 gpgme_ctx_t ctx;
 
 namespace {
@@ -32,12 +36,24 @@ void init_gpgme()
     gpgme_engine_info_t info;
     gpgme_error_t err;
 
-#ifdef WIN32
-
-#elif __APPLE__ || __UNIX__
     std::set<QString> pathset;
     QStringList newpath;
     auto path = QString::fromUtf8(qgetenv("PATH"));
+    for (auto entry: path.split(QDir::listSeparator()))
+        if (pathset.find(entry) == pathset.end()) {
+            pathset.insert(entry);
+            newpath << entry;
+        }
+
+#ifdef WIN32
+    QSettings settings("HKEY_LOCAL_MACHINE\\Software\\GnuPG",
+                       QSettings::NativeFormat);
+    auto installDir = settings.value("Install Directory").toString();
+    std::array<QString, 2> addpaths {{
+            installDir,
+            installDir + QDir::separator() + "bin"
+    }};
+#elif __APPLE__ || __UNIX__
     std::array<QString, 5> addpaths {{
         QDir::homePath() + QDir::separator() + "bin",
         "/usr/local/gnupg-2.1/bin",
@@ -45,19 +61,14 @@ void init_gpgme()
         "/opt/local/bin",
         "/opt/bin"
     }};
-
-    for (auto entry: path.split(":"))
-        if (pathset.find(entry) == pathset.end()) {
-            pathset.insert(entry);
-            newpath << entry;
-        }
+#endif
     for (auto entry: addpaths)
         if (pathset.find(entry) == pathset.end() && QDir(entry).exists()) {
             pathset.insert(entry);
             newpath << entry;
         }
-    qputenv("PATH", newpath.join(":").toUtf8());
-#endif
+
+    qputenv("PATH", newpath.join(QDir::listSeparator()).toUtf8());
 
     setlocale(LC_ALL, "");
     gpgme_check_version(nullptr);
