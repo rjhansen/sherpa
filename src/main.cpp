@@ -16,11 +16,12 @@
  */
 
 #include "mainwindow.h"
+#include "sherpa_exceptions.h"
 #include <QApplication>
-#include <QMessageBox>
 #include <QDir>
-#include <locale.h>
+#include <QMessageBox>
 #include <array>
+#include <locale.h>
 #include <set>
 
 #ifdef WIN32
@@ -39,7 +40,7 @@ void init_gpgme()
     std::set<QString> pathset;
     QStringList newpath;
     auto path = QString::fromUtf8(qgetenv("PATH"));
-    for (auto entry: path.split(QDir::listSeparator()))
+    for (auto entry : path.split(QDir::listSeparator()))
         if (pathset.find(entry) == pathset.end()) {
             pathset.insert(entry);
             newpath << entry;
@@ -47,22 +48,18 @@ void init_gpgme()
 
 #ifdef WIN32
     QSettings settings("HKEY_LOCAL_MACHINE\\Software\\GnuPG",
-                       QSettings::NativeFormat);
+        QSettings::NativeFormat);
     auto installDir = settings.value("Install Directory").toString();
-    std::array<QString, 2> addpaths {{
-            installDir,
-            installDir + QDir::separator() + "bin"
-    }};
+    std::array<QString, 2> addpaths{ { installDir,
+        installDir + QDir::separator() + "bin" } };
 #elif __APPLE__ || __UNIX__ || __unix__
-    std::array<QString, 5> addpaths {{
-        QDir::homePath() + QDir::separator() + "bin",
+    std::array<QString, 5> addpaths{ { QDir::homePath() + QDir::separator() + "bin",
         "/usr/local/gnupg-2.1/bin",
         "/usr/local/bin",
         "/opt/local/bin",
-        "/opt/bin"
-    }};
+        "/opt/bin" } };
 #endif
-    for (auto entry: addpaths)
+    for (auto entry : addpaths)
         if (pathset.find(entry) == pathset.end() && QDir(entry).exists()) {
             pathset.insert(entry);
             newpath << entry;
@@ -82,7 +79,7 @@ void init_gpgme()
     bool cond2 = NOERR(gpgme_get_engine_info(&info));
 #undef NOERR
     bool cond3 = ((nullptr != gpgme_get_dirinfo("homedir")
-            && QDir(QString(gpgme_get_dirinfo("homedir"))).exists()));
+        && QDir(QString(gpgme_get_dirinfo("homedir"))).exists()));
 
     if (!(cond1 && cond2 && cond3))
         throw GnuPGNotFound();

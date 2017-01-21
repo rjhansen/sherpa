@@ -88,10 +88,15 @@ RESOURCES  = src/sherpa.qrc
 
 SOURCES   += src/main.cpp\
              src/mainwindow.cpp \
-             src/aboutdialog.cpp
+             src/aboutdialog.cpp \
+             src/zipper.cpp \
+             src/utility.cpp
 
 HEADERS   += src/mainwindow.h \
-             src/aboutdialog.h
+             src/aboutdialog.h \
+             src/zipper.h \
+             src/sherpa_exceptions.h \
+             src/utility.h
 
 FORMS     += src/mainwindow.ui \
              src/aboutdialog.ui

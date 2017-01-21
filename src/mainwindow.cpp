@@ -16,10 +16,11 @@
  */
 
 #include "mainwindow.h"
-#include "ui_mainwindow.h"
 #include "aboutdialog.h"
-#include "minizip/unzip.h"
-#include "minizip/zip.h"
+#include "sherpa_exceptions.h"
+#include "ui_mainwindow.h"
+#include "utility.h"
+#include "zipper.h"
 
 #include <QDebug>
 #include <QDir>
@@ -38,8 +39,8 @@
 
 #ifdef WIN32
 #elif __APPLE__ || __UNIX__
-#include <sys/types.h>
 #include <sys/stat.h>
+#include <sys/types.h>
 #endif
 
 using std::vector;
@@ -53,161 +54,6 @@ namespace {
 QString clickFile = QCoreApplication::translate("sherpa", "Click “Choose file” to continue.");
 QString goBackup = QCoreApplication::translate("sherpa", "Click “Go” to back up your GnuPG folder.");
 QString goRestore = QCoreApplication::translate("sherpa", "Click “Go” to restore your GnuPG folder.");
-
-vector<uint8_t> extractKeyring(bool type = false)
-{
-    gpgme_error_t err;
-    gpgme_data_t data;
-    vector<uint8_t> buffer;
-    off_t sz = 0;
-    QString keyring;
-
-    err = gpgme_data_new(&data);
-    if (gpgme_err_code(err) != GPG_ERR_NO_ERROR) {
-        gpgme_release(ctx);
-        throw GpgmeException(err);
-    }
-
-    err = gpgme_op_export(ctx, NULL, type ? GPGME_EXPORT_MODE_SECRET : 0, data);
-    if (gpgme_err_code(err) != GPG_ERR_NO_ERROR) {
-        gpgme_data_release(data);
-        gpgme_release(ctx);
-        throw GpgmeException(err);
-    }
-
-    sz = gpgme_data_seek(data, 0, SEEK_END);
-    buffer.resize(static_cast<size_t>(sz));
-    gpgme_data_seek(data, 0, SEEK_SET);
-    sz = gpgme_data_read(data, &buffer[0], buffer.size() - 1);
-
-    gpgme_data_release(data);
-
-    return buffer;
-}
-
-list<QString> getSubdirsAndFiles(QString basedir)
-{
-    list<QString> rv;
-
-    for (auto const& fn : {
-             "gpg-agent.conf", "gpg.conf", "pubring.gpg", "secring.gpg",
-             "trustdb.gpg", "pubring.kbx", "sshcontrol", "dirmngr.conf",
-             "gpa.conf", "scdaemon.conf", "gpgsm.conf", "policies.txt",
-             "trustlist.txt", "scd-event", "tofu.db", "gpg.conf-2.1",
-             "gpg.conf-2.0", "gpg.conf-2", "gpg.conf-1.4", "gpg.conf-1" }) {
-        QFileInfo qfi(basedir + QDir::separator() + fn);
-        if (qfi.exists() && qfi.isFile() && qfi.isReadable())
-            rv.push_back(qfi.fileName());
-    }
-
-    QString dirname = "openpgp-revocs.d";
-    auto qd = QDir(basedir + QDir::separator() + dirname);
-    QRegExp revocs("^[A-Fa-f0-9]{40}\\.rev$");
-    if (qd.exists() && qd.isReadable()) {
-        qd.setFilter(QDir::Files);
-        auto files = qd.entryInfoList();
-        for (const auto& qfi : files)
-            if (qfi.isReadable() && revocs.exactMatch(qfi.fileName()))
-                rv.push_back(dirname + QDir::separator() + qfi.fileName());
-    }
-
-    dirname = "private-keys-v1.d";
-    qd = QDir(basedir + QDir::separator() + dirname);
-    QRegExp privkeys("^[A-Fa-f0-9]{40}\\.key$");
-    if (qd.exists() && qd.isReadable()) {
-        qd.setFilter(QDir::Files);
-        auto files = qd.entryInfoList();
-        for (const auto& qfi : files)
-            if (qfi.isReadable() && privkeys.exactMatch(qfi.fileName()))
-                rv.push_back(dirname + QDir::separator() + qfi.fileName());
-    }
-
-    return rv;
-}
-
-map<QString, vector<uint8_t> > getFilesAndContents(QString basedir)
-{
-    map<QString, vector<uint8_t> > rv;
-
-    for (auto const& fn : getSubdirsAndFiles(basedir)) {
-        QFile fh(basedir + QDir::separator() + fn);
-        if (!fh.open(QIODevice::ReadOnly))
-            continue;
-        auto qba = fh.readAll();
-        rv[fn] = vector<uint8_t>(qba.cbegin(), qba.cend());
-    }
-    rv["public_keys.bin"] = extractKeyring(false);
-    rv["private_keys.bin"] = extractKeyring(true);
-    return rv;
-}
-
-map<QString, QByteArray> readSherpaFile(QString zipfilename)
-{
-    map<QString, QByteArray> rv;
-    std::array<char, 80> comment_buf;
-    std::array<char, 1024> filename;
-
-    std::fill(comment_buf.begin(), comment_buf.end(), '\0');
-    std::fill(filename.begin(), filename.end(), '\0');
-
-    auto fn_qba = zipfilename.toUtf8();
-    auto zipfile = unzOpen(fn_qba.data());
-    int zip_err;
-
-    unzGetGlobalComment(zipfile, &comment_buf[0], comment_buf.size());
-    QString version(&comment_buf[0]);
-    if (!version.startsWith("Sherpa")) {
-        unzClose(zipfile);
-        throw NotASherpa();
-    }
-
-    zip_err = unzGoToFirstFile(zipfile);
-    if (zip_err != UNZ_OK) {
-        unzClose(zipfile);
-        throw UncompressError();
-    }
-
-    while (zip_err == UNZ_OK) {
-        unz_file_info info;
-        std::fill(filename.begin(), filename.end(), '\0');
-
-        unzGetCurrentFileInfo(zipfile,
-            &info,
-            &filename[0],
-            filename.size(),
-            NULL,
-            0,
-            &comment_buf[0],
-            comment_buf.size());
-
-        if (info.uncompressed_size > (256 * 1048576)) {
-            unzClose(zipfile);
-            throw UncompressError();
-        }
-
-        QByteArray uncompressed(static_cast<int>(info.uncompressed_size), 0);
-        if (UNZ_OK != unzOpenCurrentFile(zipfile)) {
-            unzClose(zipfile);
-            throw UncompressError();
-        }
-        if (0 > unzReadCurrentFile(zipfile,
-                    uncompressed.data(),
-                    static_cast<uint32_t>(uncompressed.size()))) {
-            unzCloseCurrentFile(zipfile);
-            unzClose(zipfile);
-            throw UncompressError();
-        }
-        if (UNZ_CRCERROR == unzCloseCurrentFile(zipfile)) {
-            unzClose(zipfile);
-            throw UncompressError();
-        }
-
-        rv[QString(&filename[0])] = uncompressed;
-        zip_err = unzGoToNextFile(zipfile);
-    }
-    unzClose(zipfile);
-    return rv;
-}
 }
 
 MainWindow::MainWindow(QWidget* parent)
@@ -311,12 +157,12 @@ void MainWindow::backupTo()
         data = getFilesAndContents(gnupgDir);
     } catch (const GpgmeException&) {
         QMessageBox::critical(this,
-                              tr("A haiku for you!"),
-                              tr("Good days and bad days.\n"
-                                 "GPGME’s having\n"
-                                 "The latter.  Error!\n\n"),
-                              QMessageBox::Abort,
-                              QMessageBox::Abort);
+            tr("A haiku for you!"),
+            tr("Good days and bad days.\n"
+               "GPGME’s having\n"
+               "The latter.  Error!\n\n"),
+            QMessageBox::Abort,
+            QMessageBox::Abort);
         qApp->exit(1);
     }
 
@@ -338,15 +184,16 @@ void MainWindow::backupTo()
         file.remove();
 
     auto fn_qba = ui->lineEdit->text().toUtf8();
-    auto zipfile = zipOpen(fn_qba.data(), APPEND_STATUS_CREATE);
-    for (auto const& elem : data) {
-        auto this_qba = elem.first.toUtf8();
-        zipOpenNewFileInZip(zipfile, this_qba.data(), NULL, NULL, 0, NULL, 0, NULL, Z_DEFLATED, Z_DEFAULT_COMPRESSION);
-        zipWriteInFileInZip(zipfile, &elem.second[0], static_cast<uint32_t>(elem.second.size()));
-        zipCloseFileInZip(zipfile);
+
+    {
+        OZipFile ozf{ fn_qba.data() };
+        ozf.setGlobalComment(version.toUtf8().data());
+        for (auto const& elem : data) {
+            const char* name = elem.first.toUtf8().data();
+            const auto& data = elem.second;
+            ozf.insert(name, data.cbegin(), data.cend());
+        }
     }
-    auto comment = version.toUtf8();
-    zipClose(zipfile, comment.data());
 
     QMessageBox::information(this,
         tr("Success"),
@@ -364,7 +211,7 @@ void MainWindow::restoreFrom()
 
     try {
         files = readSherpaFile(ui->lineEdit->text());
-    } catch (const UncompressError&) {
+    } catch (const ZipError&) {
         QMessageBox::information(this,
             tr("File corruption"),
             tr("An error occurred while uncompressing this file."),
@@ -380,9 +227,7 @@ void MainWindow::restoreFrom()
         return;
     }
 
-    QFileDevice::Permissions privatePerm =
-            QFileDevice::ReadOwner | QFileDevice::WriteOwner |
-            QFileDevice::ReadUser  | QFileDevice::WriteUser;
+    QFileDevice::Permissions privatePerm = QFileDevice::ReadOwner | QFileDevice::WriteOwner | QFileDevice::ReadUser | QFileDevice::WriteUser;
     for (auto const& elem : files) {
         if (elem.first.endsWith(".bin"))
             continue;
@@ -390,7 +235,7 @@ void MainWindow::restoreFrom()
         auto contents = elem.second;
         QFileInfo qfi(fn);
         QDir dir = qfi.absoluteDir();
-        if (! dir.exists())
+        if (!dir.exists())
             dir.mkpath(".");
         QFile fh(fn);
         if (fh.exists())
@@ -425,9 +270,7 @@ void MainWindow::restoreFrom()
     unzClose(zipfile);
 
     QString version(&comment_buf[0]);
-    if ((gpgType == GpgType::modern && !version.endsWith("Modern")) ||
-            (gpgType != GpgType::modern && version.endsWith("Modern")))
-    {
+    if ((gpgType == GpgType::modern && !version.endsWith("Modern")) || (gpgType != GpgType::modern && version.endsWith("Modern"))) {
         gpgme_data_t foo;
         const QByteArray& bar = files["public_keys.bin"];
         gpgme_data_new_from_mem(&foo, bar.data(), bar.size(), 0);
